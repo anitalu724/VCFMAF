@@ -30,3 +30,9 @@ python3 maf_analysis.py \
 -f sample_data/20200822_result/maf_combination.maf \
 -tmb nonsynonmous 60456963 \
 -o sample_data/20200828_analysis
+
+6. 
+python3 maf_analysis.py \
+-f sample_data/example/CBCP_oncokb_maf.txt \
+-oncokb ../oncokb-annotator/ ca398551-c549-49bd-80f0-0e68d9ca033c 1 sample_data/example/CBCP_oncokb_clinical.txt \
+-o sample_data/20200930

@@ -58,7 +58,8 @@ def main():
 # 6. OncoKB Annotator
     if args.oncokb_annotator:
         df = OncoKBAnnotator(args.file[0])
-        df.data_analysis(folder, args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[2],args.oncokb_annotator[3])
+        df.data_analysis(folder, args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[3])
+        df.plotting(folder, args.oncokb_annotator[2])
 
 
 

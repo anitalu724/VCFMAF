@@ -18,6 +18,7 @@ import seaborn as sns
 # sns.set(color_codes = True)
 import matplotlib.pyplot as plt
 import matplotlib.style
+from matplotlib.ticker import MaxNLocator
 
 # 1. CoMut Plot Analysis
 class CoMutAnalysis:
@@ -422,15 +423,90 @@ class OncoKBAnnotator:
     def __init__(self, file):
         print(colored(("\nStart OncoKB annotator(drug)...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
-
-    def data_analysis(self, folder, path, token, level, clinical):
+    def data_analysis(self, folder, path, token, clinical):
         selected_df = (self.df[['Hugo_Symbol', 'Variant_Classification', 'Tumor_Sample_Barcode', 'HGVSp_Short', 'HGVSp']]).set_index("Hugo_Symbol")
         selected_df.to_csv(folder + "maf_5col_oncokb_input.txt", sep="\t")
         os.system("python3 " + path + "MafAnnotator.py -i " + folder + "maf_5col_oncokb_input.txt -o " + folder + "maf_5col_oncokb_output.txt -b " + token + "\n")
         os.system("python3 " + path + "ClinicalDataAnnotator.py -i "+clinical+" -o "+folder+"clinical_oncokb_output.txt -a "+folder+"maf_5col_oncokb_output.txt")
+        os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   "+folder+"maf_5col_oncokb_output.txt"), 'green'))
-        print(colored(("   "+folder+"clinical_oncokb_output.txt"), 'green'))
+        print(colored(("   " + folder + "clinical_oncokb_output.txt"), 'green'))
+    def plotting(self, folder, level='4'):
+        self.file = folder + "clinical_oncokb_output.txt"
+        df = pd.read_csv(self.file, sep="\t")
+        df_level = df[['HIGHEST_LEVEL']]
+        level_list = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3A', 'LEVEL_3B', 'LEVEL_4']
+        level_dict = dict.fromkeys(level_list,0)
+        
+        sample_size = df.shape[0]
+        for i in range(sample_size):
+            if df_level.iloc[i]['HIGHEST_LEVEL'] in level_list:
+                level_dict[df_level.iloc[i]['HIGHEST_LEVEL']] += 1
+        true_num = 0
+        
+        if level == '4':
+            true_num = sum(level_dict.values())
+        elif level == '3':
+            true_num = sum(level_dict.values()) - level_dict['LEVEL_4']
+            level_list = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3A', 'LEVEL_3B']
+        elif level == '2':
+            true_num = level_dict['LEVEL_1'] + level_dict['LEVEL_2']
+            level_list = ['LEVEL_1', 'LEVEL_2']
+        elif level == '1':
+            true_num = level_dict['LEVEL_1']
+            level_list = ['LEVEL_1']
+
+        size = [true_num, sample_size - true_num]
+        labels = "Actionable\nbiomarkers","Current absence\nof new actionable\nbiomarkers"
+        fig1, ax1 = plt.subplots()
+        ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#b7d5ea','#266199'] ,textprops={'fontsize': 11})
+        ax1.axis('equal')
+        plt.title("Total", fontsize=18, fontweight='bold')
+        plt.savefig(folder+"oncokb_total_pie.png", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + folder + "oncokb_total_pie.png"), 'green'))
+        df_drug_count = df[level_list]
+        drug_total_dict = {}
+        for i in range(sample_size):
+            for item in level_list:
+                data = df_drug_count.iloc[i][item]
+                if not pd.isna(data):
+                    new_drug_list = data.split("(")
+                    new_drug_list.pop(0)
+                    for drug in new_drug_list:
+                        drug_name = drug.split(" ")[0]
+                        if drug_name not in drug_total_dict:
+                            drug_total_dict[drug_name] = 1
+                        else:
+                            drug_total_dict[drug_name] += 1
+        langs = list(drug_total_dict.keys())
+        count = list(drug_total_dict.values())
+        fig2 = plt.figure(figsize=(8,5))
+        ax2 = fig2.add_axes([0,0,1,1])
+        ax2.bar(langs, count, color='#266199')
+        plt.xticks(fontsize=12)
+        ax2.set_yticks(np.arange(0, max(count) + 1, 5))
+        plt.yticks(fontsize=12)
+        plt.xlabel("Gene name")
+        plt.ylabel("Count")
+
+        plt.title("Actionable Genes", fontsize=18, fontweight='bold')
+        plt.savefig(folder+"oncokb_actionable_genes.png", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + folder + "oncokb_actionable_genes.png"), 'green'))
+        
+
+        
+                    
+            
+
+
+        
+
+
+        
+
+
+
 
 
 
