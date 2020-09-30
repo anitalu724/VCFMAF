@@ -9,7 +9,7 @@
 import numpy as np
 import pandas as pd
 import argparse, textwrap
-from src.maf_analysis import CoMutAnalysis, SigMutatedGeneDetection, KnownCancerGeneAnnotation, MutationalSignature, TotalMutationBurden
+from src.maf_analysis import CoMutAnalysis, SigMutatedGeneDetection, KnownCancerGeneAnnotation, MutationalSignature, TotalMutationBurden,OncoKBAnnotator
 
 def main():
     parser = argparse.ArgumentParser(description="MAF analysis", formatter_class=argparse.RawTextHelpFormatter)
@@ -20,10 +20,11 @@ def main():
     parser.add_argument('-ms', '--mutational_signature', nargs=1, metavar="figures_folder")
     parser.add_argument("-tmb", "--total_mutation_burden", nargs=2, help="One item must be entered:\n \
                                                                           1. Sequencing Length\n" )
-    parser.add_argument("-oncokb", "--oncokb_annotator", nargs=3, help="Three items must be entered:\n \
+    parser.add_argument("-oncokb", "--oncokb_annotator", nargs=4, help="Three items must be entered:\n \
                                                                         1. The relative path of the folder \"oncokb-annotator\".\n \
                                                                         2. The token of your OncoKB account.\n \
-                                                                        3. The level of the drug.")
+                                                                        3. The level of the drug. \n\
+                                                                        4. The file path of clinical input.\n")
     parser.add_argument("-o", "--output", required = True, metavar="OUTPUT folder",help="The path for storing every generated file.\nThis path must end with a folder.\n")
     args = parser.parse_args()
 
@@ -56,7 +57,8 @@ def main():
         df.data_analysis(folder, args.total_mutation_burden[0], int(args.total_mutation_burden[1]))
 # 6. OncoKB Annotator
     if args.oncokb_annotator:
-        return
+        df = OncoKBAnnotator(args.file[0])
+        df.data_analysis(folder, args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[2],args.oncokb_annotator[3])
 
 
 

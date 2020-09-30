@@ -417,5 +417,25 @@ class TotalMutationBurden:
         print(colored(("   "+folder+"TMB_statistic.tsv"), 'green'))
 
 
+# 6. OncoKB annotator
+class OncoKBAnnotator:
+    def __init__(self, file):
+        print(colored(("\nStart OncoKB annotator(drug)...."), 'yellow'))
+        self.head, self.df = fast_read_maf(file)
+
+    def data_analysis(self, folder, path, token, level, clinical):
+        selected_df = (self.df[['Hugo_Symbol', 'Variant_Classification', 'Tumor_Sample_Barcode', 'HGVSp_Short', 'HGVSp']]).set_index("Hugo_Symbol")
+        selected_df.to_csv(folder + "maf_5col_oncokb_input.txt", sep="\t")
+        os.system("python3 " + path + "MafAnnotator.py -i " + folder + "maf_5col_oncokb_input.txt -o " + folder + "maf_5col_oncokb_output.txt -b " + token + "\n")
+        os.system("python3 " + path + "ClinicalDataAnnotator.py -i "+clinical+" -o "+folder+"clinical_oncokb_output.txt -a "+folder+"maf_5col_oncokb_output.txt")
+        print(colored("=> Generate analysis files: ", 'green'))
+        print(colored(("   "+folder+"maf_5col_oncokb_output.txt"), 'green'))
+        print(colored(("   "+folder+"clinical_oncokb_output.txt"), 'green'))
+
+
+
+
+
+
         
 
