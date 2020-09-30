@@ -1,0 +1,3 @@
+NORMAL	TUMOR	MuSe	Mutect2	SomaticSniper	Strelka2	VarScan2	At Least
+CBCP00119-N1	CBCP00119-T1	./sample_data/MuSe/CBCP00119-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00119-T1_somatic_oncefiltered.vcf				1
+CBCP00117-N1	CBCP00117-T1	./sample_data/MuSe/CBCP00117-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00117-T1_somatic_oncefiltered.vcf			./sample_data/VarScan2/CBCP00117-T1.snv.Somatic.hc.vcf	4

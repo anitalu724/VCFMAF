@@ -1,0 +1,10 @@
+NORMAL	TUMOR	MuSe	Mutect2	SomaticSniper	Strelka2	VarScan2	At Least
+CBCP00111-N1	CBCP00111-T1	./sample_data/MuSe/CBCP00111-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00111-T1_somatic_oncefiltered.vcf		./sample_data/Strelka2/CBCP00111-T1.strelka.somatic.snvs.vcf	./sample_data/VarScan2/CBCP00111-T1.snv.Somatic.hc.vcf	1
+CBCP00112-N1	CBCP00112-T1	./sample_data/MuSe/CBCP00112-T1.muse.variants.vcf					1
+CBCP00113-N1	CBCP00113-T1	./sample_data/MuSe/CBCP00113-T1.muse.variants.vcf			./sample_data/Strelka2/CBCP00113-T1.strelka.somatic.snvs.vcf	./sample_data/VarScan2/CBCP00113-T1.snv.Somatic.hc.vcf	1
+CBCP00114-N1	CBCP00114-T1	./sample_data/MuSe/CBCP00114-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00114-T1_somatic_oncefiltered.vcf	./sample_data/SomaticSniper/CBCP00114-T1.somaticsniper_variants.vcf	./sample_data/Strelka2/CBCP00114-T1.strelka.somatic.snvs.vcf	./sample_data/VarScan2/CBCP00114-T1.snv.Somatic.hc.vcf	1
+CBCP00116-N1	CBCP00116-T1		./sample_data/Mutect2/CBCP00116-T1_somatic_oncefiltered.vcf		./sample_data/Strelka2/CBCP00116-T1.strelka.somatic.snvs.vcf	./sample_data/VarScan2/CBCP00116-T1.snv.Somatic.hc.vcf	1
+CBCP00117-N1	CBCP00117-T1	./sample_data/MuSe/CBCP00117-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00117-T1_somatic_oncefiltered.vcf			./sample_data/VarScan2/CBCP00117-T1.snv.Somatic.hc.vcf	1
+CBCP00118-N1	CBCP00118-T1	./sample_data/MuSe/CBCP00118-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00118-T1_somatic_oncefiltered.vcf			./sample_data/VarScan2/CBCP00118-T1.snv.Somatic.hc.vcf	1
+CBCP00119-N1	CBCP00119-T1	./sample_data/MuSe/CBCP00119-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00119-T1_somatic_oncefiltered.vcf				1
+CBCP00271-N1	CBCP00271-T1	./sample_data/MuSe/CBCP00271-T1.muse.variants.vcf	./sample_data/Mutect2/CBCP00119-T1_somatic_oncefiltered.vcf			./sample_data/VarScan2/CBCP00271-T1.snv.Somatic.hc.vcf	2
