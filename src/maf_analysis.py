@@ -493,6 +493,75 @@ class OncoKBAnnotator:
         plt.title("Actionable Genes", fontsize=18, fontweight='bold')
         plt.savefig(folder+"oncokb_actionable_genes.png", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + folder + "oncokb_actionable_genes.png"), 'green'))
+
+
+class HRDScore:
+    def __init__(self, file):
+        print(colored(("\nStart Analysing HRD Score...."), 'yellow'))
+        self.list = ((pd.read_csv(file, sep="\t"))[['CNV_input']].values.T)[0]
+    def data_analysis(self, folder, ref):
+        scar_r = open(folder + "scar.r", "a")
+        scar_r.write("library(\"scarHRD\")\n")
+        meta_list = []
+        for i in self.list:
+            scar_r.write("scar_score(\"" + i + "\", reference = \""+ref+"\", seqz = FALSE, outputdir = \"" + folder[:-1] + "\")\n")
+        scar_r.close()
+        os.system("Rscript " + folder + "scar.r\n")
+        os.system("rm "+ folder + "scar.r\n")
+        
+        for file in os.listdir(folder):
+            if file.endswith("_HRDresults.txt"):
+                meta_list.append(file)
+        meta_list.sort(reverse = True)
+        final_df = pd.DataFrame()
+        for meta in meta_list:
+            df = pd.read_csv(folder+meta, sep="\t", index_col=False)
+            final_df = pd.concat([df, final_df]) if not final_df.empty else df
+            os.system("rm " + folder + meta + "\n")
+        final_df.columns = [['Sample_id','HRD','Telomeric_AI','LST','HRD-sum']]
+        final_df.to_csv(folder + "all_HRDresults.csv",  index=False)
+        print(colored("=> Generate analysis files: ", 'green'))
+        print(colored(("   " + folder + "all_HRDresults.csv"), 'green'))
+    def plotting(self, folder):
+        df = pd.read_csv(folder+"all_HRDresults.csv")
+        size = df.shape[0]
+        HRD = tuple(list(df['HRD']))
+        TAI = tuple(list(df['Telomeric_AI']))
+        LST = tuple(list(df['LST']))
+        SUM = list(df["HRD-sum"])
+        Sample = tuple(list(df['Sample_id']))
+        ind = np.arange(size)
+        width = 0.8
+        fig = plt.figure(figsize=(12, 6))
+        ax = fig.add_axes([0,0,1,1])
+        ax.bar(ind, HRD, width, color='#266199')
+        ax.bar(ind, TAI, width,bottom=HRD, color='#b7d5ea')
+        ax.bar(ind, LST, width,bottom=np.array(TAI)+np.array(HRD), color='#acc6aa')
+        ax.set_ylabel('Scores')
+        ax.set_title('HRD Scores',fontsize=18, fontweight='bold')
+        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light')
+        # ax.set_xticks(ind, tuple(list(df['Sample'])))
+        ax.set_yticks(np.arange(0, max(SUM)+3, 10))
+        ax.legend(labels=['HRD','Telomeric_AI','LST'])
+        plt.savefig(folder+"HRD_Score.png", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + folder + "HRD_Score.png"), 'green'))
+        over = len([i for i in SUM if i >=42])
+        data = [over, size-over]
+        labels='≧ 42','< 42'
+        fig1, ax1 = plt.subplots()
+        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#266199','#b7d5ea'] ,textprops={'fontsize': 11})
+        ax1.axis('equal')
+        plt.title("High HRD Score Propotion", fontsize=18, fontweight='bold')
+        plt.savefig(folder+"high_HRD_pie.png", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + folder + "high_HRD_pie.png"), 'green'))
+
+
+        
+            
+        
+            
+
+        
         
 
         
