@@ -42,3 +42,9 @@ python3 maf_analysis.py \
 -f sample_data/example/CBCP_oncokb_maf.txt \
 -hrd sample_data/tsv/HRD_tsv/HRD_input.tsv grch37 \
 -o sample_data/20200930
+
+7.
+python3 maf_analysis.py \
+-f sample_data/example/CBCP_oncokb_maf.txt \
+-wgdcin sample_data/tsv/HRD_tsv/HRD_input.tsv \
+-o sample_data/20200930

@@ -497,7 +497,7 @@ class OncoKBAnnotator:
 
 class HRDScore:
     def __init__(self, file):
-        print(colored(("\nStart Analysing HRD Score...."), 'yellow'))
+        print(colored(("\nStart analysing HRD Score...."), 'yellow'))
         self.list = ((pd.read_csv(file, sep="\t"))[['CNV_input']].values.T)[0]
     def data_analysis(self, folder, ref):
         scar_r = open(folder + "scar.r", "a")
@@ -540,7 +540,6 @@ class HRDScore:
         ax.set_ylabel('Scores')
         ax.set_title('HRD Scores',fontsize=18, fontweight='bold')
         plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light')
-        # ax.set_xticks(ind, tuple(list(df['Sample'])))
         ax.set_yticks(np.arange(0, max(SUM)+3, 10))
         ax.legend(labels=['HRD','Telomeric_AI','LST'])
         plt.savefig(folder+"HRD_Score.png", dpi=300,bbox_inches='tight')
@@ -556,31 +555,73 @@ class HRDScore:
         print(colored(("=> Generate Pie Plot: " + folder + "high_HRD_pie.png"), 'green'))
 
 
+class WGDnCIN:
+    def __init__(self, file):
+        print(colored(("\nStart analysing WGD and CIN...."), 'yellow'))
+        self.list = ((pd.read_csv(file, sep="\t"))[['CNV_input']].values.T)[0]
+    def data_analysis(self, folder):
+        genome_length = [249250621, 243199373, 198022430, 191154276, 180915260,
+                         171115067, 159138663, 146364022, 141213431, 135534747,
+                         135006516, 133851895, 115169878, 107349540, 102531392,
+                         90354753, 81195210, 78077248, 59128983, 63025520, 48129895, 51304566]
+        whole_length = sum(genome_length)
+        WGD_dict, CIN_dict = {}, {}
+        for sample in self.list:
+            df = pd.read_csv(sample, sep="\t")
+            sample_name = pd.unique(df['SampleID'])[0]
+            WGD_selected = df.loc[(df['A_cn'] >= 2)]
+            CIN_selected = df.loc[(df['A_cn'] != 1) & (df['B_cn'] != 1)]
+            WGD_SUM, CIN_SUM = 0, 0
+            for i in range(WGD_selected.shape[0]):
+                WGD_SUM += WGD_selected.iloc[i]['End_position']-WGD_selected.iloc[i]['Start_position']
+            for i in range(CIN_selected.shape[0]):
+                CIN_SUM += CIN_selected.iloc[i]['End_position']-CIN_selected.iloc[i]['Start_position']
+            WGD_dict[sample_name] = (WGD_SUM >= 0.5*whole_length)
+            CIN_dict[sample_name] = CIN_SUM/whole_length
+        WGD_df = pd.DataFrame.from_dict(WGD_dict, orient='index').reset_index()
+        CIN_df = pd.DataFrame.from_dict(CIN_dict, orient='index').reset_index()
+        WGD_df.columns,CIN_df.columns = [['SampleID','WGD']], [['SampleID','CIN']]
+        WGD_df.to_csv(folder + "WGD_result.csv",  index=False)
+        CIN_df.to_csv(folder + "CIN_result.csv",  index=False)
+        print(colored("=> Generate analysis files: ", 'green'))
+        print(colored(("   " + folder + "WGD_result.csv"), 'green'))
+        print(colored(("   " + folder + "CIN_result.csv"), 'green'))
+    def plotting(self, folder):
+        # WGD Pie Plot
+        wgd_df = pd.read_csv(folder+"WGD_result.csv")
+        data = [0,0]
+        for i in range(wgd_df[['WGD']].shape[0]):
+            if wgd_df[['WGD']].iloc[i]['WGD'] == False:
+                data[1]+=1
+            elif wgd_df[['WGD']].iloc[i]['WGD'] == True:
+                data[0]+=1
+        labels = 'True','False'
+        fig1, ax1 = plt.subplots()
+        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#266199','#b7d5ea'] ,textprops={'fontsize': 11})
+        ax1.axis('equal')
+        plt.title("WGD Propotion", fontsize=18, fontweight='bold')
+        plt.savefig(folder+"WGD_pie.png", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + folder + "WGD_pie.png"), 'green'))
         
+        # CIN Bar plot
+        CIN_df = pd.read_csv(folder+"CIN_result.csv")
+
+        size = CIN_df.shape[0]
+        CIN = tuple(list(CIN_df['CIN']))
+        Sample = tuple(list(CIN_df['SampleID']))
+        ind = np.arange(size)
+        width = 0.8
+        fig = plt.figure(figsize=(12, 6))
+        ax = fig.add_axes([0,0,1,1])
+        ax.bar(ind, CIN, width, color='#266199')
+        ax.set_ylabel('Scores')
+        ax.set_title('CIN Scores',fontsize=18, fontweight='bold')
+        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light')
+        ax.set_yticks(np.arange(0, 1, 0.2))
+        plt.savefig(folder+"CIN_Score.png", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + folder + "CIN_Score.png"), 'green'))
+
+
+
             
-        
-            
-
-        
-        
-
-        
-                    
-            
-
-
-        
-
-
-        
-
-
-
-
-
-
-
-
-
-        
 
