@@ -3,10 +3,10 @@ rm sample_data/20200822_result/*
 
 1. vcf filtering, combination, vcf2maf
 python3 vcf_maf_process.py \
--f sample_data/vcf_tsv/category1.tsv \
+-f sample_data/tsv/vcf_tsv/category1.tsv \
 -c \
 -v2m 48 \
--o sample_data/20200928_test
+-o sample_data/20201007
 
 2. vcf filtering, combination, vcf2maf, maf_filtering, maf_combination
 python3 vcf_maf_process.py \

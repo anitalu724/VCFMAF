@@ -484,13 +484,12 @@ class OncoKBAnnotator:
         fig2 = plt.figure(figsize=(8,5))
         ax2 = fig2.add_axes([0,0,1,1])
         ax2.bar(langs, count, color='#266199')
-        plt.xticks(fontsize=12)
+        plt.xticks(fontsize=14)
         ax2.set_yticks(np.arange(0, max(count) + 1, 5))
-        plt.yticks(fontsize=12)
-        plt.xlabel("Gene name")
+        plt.yticks(fontsize=14)
         plt.ylabel("Count")
 
-        plt.title("Actionable Genes", fontsize=18, fontweight='bold')
+        plt.title("Frequency of Actionable Genes", fontsize=18, fontweight='bold')
         plt.savefig(folder+"oncokb_actionable_genes.png", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + folder + "oncokb_actionable_genes.png"), 'green'))
 
@@ -550,7 +549,7 @@ class HRDScore:
         fig1, ax1 = plt.subplots()
         ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#266199','#b7d5ea'] ,textprops={'fontsize': 11})
         ax1.axis('equal')
-        plt.title("High HRD Score Propotion", fontsize=18, fontweight='bold')
+        plt.title("Propotion of Samples with HRD Phenotype", fontsize=18, fontweight='bold')
         plt.savefig(folder+"high_HRD_pie.png", dpi=300, bbox_inches='tight')
         print(colored(("=> Generate Pie Plot: " + folder + "high_HRD_pie.png"), 'green'))
 
@@ -599,7 +598,7 @@ class WGDnCIN:
         fig1, ax1 = plt.subplots()
         ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#266199','#b7d5ea'] ,textprops={'fontsize': 11})
         ax1.axis('equal')
-        plt.title("WGD Propotion", fontsize=18, fontweight='bold')
+        plt.title("Propotion of Samples with WGD", fontsize=18, fontweight='bold')
         plt.savefig(folder+"WGD_pie.png", dpi=300, bbox_inches='tight')
         print(colored(("=> Generate Pie Plot: " + folder + "WGD_pie.png"), 'green'))
         
