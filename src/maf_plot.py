@@ -30,6 +30,7 @@ class CoMutPlot:
             self.fd[item] = cleanedList
         self.info = (pd.read_csv(info, sep="\t")).to_dict('list')
         for item in self.info:
+            print(item)
             cleanedList = [x for x in self.info[item] if str(x) != 'nan']
             self.info[item] = cleanedList
     def plot(self, folder, theme, name):
