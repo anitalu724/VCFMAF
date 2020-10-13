@@ -27,5 +27,11 @@ python3.7 maf_plotting.py \
 testing:
 
 python3 maf_plotting.py \
+-cs sample_data/pic/S2S_matrix.csv \
+-sbs sample_data/pic/nmf_res_signature.csv \
 -dn sample_data/pic/nmf_res_contribution.csv \
 -o sample_data/pic/
+
+python3 maf_plotting.py \
+-cmp sample_data/tsv/comut_tsv/comut.tsv sample_data/tsv/comut_tsv/comut_info.tsv 0 comut.png \
+-o sample_data/pic/ 
