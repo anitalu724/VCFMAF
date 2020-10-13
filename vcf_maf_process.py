@@ -44,7 +44,7 @@ def read_tsv(tsv_file):
         print("\n")
         flag = "maf"
         return flag, category, category_caller
-    elif file.shape[1] == 8:    # VCF and MAF
+    elif file.shape[1] == 9:    # VCF and MAF
         for i in range(file.shape[0]):
             sample, vcf_file, caller_list = [], [], []
             sample.append(file.loc[i,'NORMAL'])
@@ -58,7 +58,8 @@ def read_tsv(tsv_file):
                     vcf_file.append(file.loc[i, j])
                     caller_list.append(j)
             sample.append(vcf_file)
-            sample.append(file.loc[i,'At Least'])
+            sample.append(file.loc[i,'At Least # CALLS'])
+            sample.append(file.loc[i,'At Most # REJECT'])
             category.append(sample)
             category_caller.append(caller_list)
         for i in category:
@@ -66,10 +67,10 @@ def read_tsv(tsv_file):
                 print(colored(ErrorPrint.TSV_format.value, 'red'))
                 return False, False, False
             sample = []
-            sample.extend((i[0], i[1], len(i[2]), i[3]))
+            sample.extend((i[0], i[1], len(i[2]), i[3], i[4]))
             category_print.append(sample)
         print(colored("\nThe input tsv file\'s content:\n", "green"))
-        print(tabulate(category_print, headers=['NORMAL', 'TUMOR', '# of VCF files', 'At least # of variants'], tablefmt='orgtbl'))
+        print(tabulate(category_print, headers=['NORMAL', 'TUMOR', '# of VCF files', 'At least # of variants', 'At most # of REJECT'], tablefmt='orgtbl'))
         flag = "vcf"
         return flag, category, category_caller
     else:
@@ -197,16 +198,18 @@ def main():
                                                "TE: Tissue Expression\n"
                                                "PF: Population Frequency\n"
                                                "H: Hypermutation or Sample Exclusion\n\n"))
-    parser.add_argument("-o", "--output", required = True, help="The path for storing every generated files.\nThis path must end with a folder.\n")
+    parser.add_argument("-o", "--output", required = True, help="The path for storing output files.\nThis path must end with a folder.\n")
+    parser.add_argument("-m","--metafile", required = True, help="The path for storing metafiles.\nThis path must end with a folder.\n")
     args = parser.parse_args()
 
     # Read TSV file
     print(colored("\nReading TSV file....", "yellow"))
-    flag, category, category_caller = read_tsv(args.file)
-    metafile, maf_output_list = [],[]
-    folder = args.output
+    maf_output_list = []
+    folder, meta = args.output, args.metafile
     if folder[-1:] != "/":
         folder += "/"
+    if meta[-1:] != "/":
+        meta += "/"
 # Solution 1: VCF
     if flag == "vcf":  
         if not args.combine or not args.vcf2maf:
@@ -231,9 +234,8 @@ def main():
                         print(colored(("Warning: FFPE filter does not apply to variant = "+ category_caller[s_idx][vcf_idx]), 'red'))
                         print("Skip the FFPE filter for " + sample[2][vcf_idx])
                 del_count, change = 0, False
-                output_path = folder+(sample[2][vcf_idx].split("/")[-1])[:-4]+"_formalized.vcf" if not args.vcf_filter else folder+(sample[2][vcf_idx].split("/")[-1])[:-4]+"_formalized_filter.vcf"
+                output_path = meta+(sample[2][vcf_idx].split("/")[-1])[:-4]+"_formalized.vcf" if not args.vcf_filter else meta+(sample[2][vcf_idx].split("/")[-1])[:-4]+"_formalized_filter.vcf"
                 formalized_data_list.append(output_path)
-                # metafile.append(output_path)
                 if len(vcf_read.samples) == 2:
                     change = nt_test(vcf_read, len(vcf_read.samples), category_caller[s_idx][vcf_idx])
                 vcf_read = read_vcf(sample[2][vcf_idx])
@@ -286,14 +288,10 @@ def main():
     # VCF Combination (Required)
         if args.combine:
             print(colored("\nStart VCF combination....\n", "yellow"))
-            folder = args.output
-            if folder[-1:] != "/":
-                folder += "/"
             combine_output_list = []
             for idx in range(len(category)):
-                path_name = folder+category[idx][0]+"_"+category[idx][1]+"_combination.vcf"
+                path_name = meta+category[idx][0]+"_"+category[idx][1]+"_combination.vcf"
                 combine_output_list.append(path_name)
-                # metafile.append(path_name)
             for idx, sample in enumerate(category):
                 vcf_combination(category[idx], category_caller[idx], combine_output_list[idx])
 
@@ -303,11 +301,10 @@ def main():
                 del_cou = 0
                 vcf_read = read_vcf(file)
                 vcf_writer = vcf.Writer(open(combine_filter_filelist[idx],"w"), vcf_read)
-                # metafile.append(combine_filter_filelist[idx])
                 for record in vcf_read:
                     calls = len(record.INFO['CALLS'].split('_')) if record.INFO['CALLS']!= None else 0
                     reject = len(record.INFO['REJECT'].split('_')) if record.INFO['REJECT'] != None else 0
-                    if calls - reject >= category[idx][3]:
+                    if calls >= category[idx][3] and reject <= category[idx][4]:
                         vcf_writer.write_record(record)
                     else:
                         del_cou+=1
@@ -319,15 +316,10 @@ def main():
         if args.vcf2maf:
             print(colored("Start transforming VCF to MAF....\n", "yellow"))
             print("WARNING: This transformation tool must be implemented in the direction of \"mskcc-vcf2maf-bbe39fe\"!\n")
-            for idx, file in enumerate(combine_output_list):
+            for idx, file in enumerate(combine_filter_filelist):
                 fileName = file[:-4]+"_2maf.maf"
-                # newPath = shutil.copy(file, folder)
-                # combine_output_list[idx] = newPath
-                # fileName = combine_output_list[idx][combine_output_list[idx].rfind("/")+1:-4]+"_2maf.maf"
                 maf_output_list.append(fileName)
-                # metafile.append(fileName)
-                # metafile.append(fileName[:-9]+".vep.vcf")
-            vcf2vep2maf(combine_output_list, maf_output_list, folder, category, args.vcf2maf[0])
+            vcf2vep2maf(combine_filter_filelist, maf_output_list, folder, category, args.vcf2maf[0])
 
     # MAF Filtering (Optional)
         if args.maf_filter:
@@ -432,8 +424,6 @@ def main():
                         filtered_file.writelines(lines)
                 print(colored(("=> Finish combining MAF files to " + folder + "maf_combination.maf" + "\n"), 'green'))
             
-        
-        
 
 if __name__ == '__main__':
     main()

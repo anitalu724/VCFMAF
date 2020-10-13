@@ -22,6 +22,17 @@ from matplotlib.ticker import MaxNLocator
 
 # 1. CoMut Plot Analysis
 class CoMutAnalysis:
+    """CoMut plot analysis
+
+    Arguments:
+        file {string} -- A MAF file path
+        folder {string} -- The path for every output file
+
+    Outputs:
+        mutation_data.tsv
+        mutation_burden.tsv
+    
+    """    
     def __init__(self, file):
         print(colored(("\nStart CoMut_Plot_Analysis...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
@@ -83,6 +94,20 @@ class CoMutAnalysis:
 
 # 2. Significantly mutated gene detection (Only oncodriveCLUST works until now)
 class SigMutatedGeneDetection:
+    """Significantly mutated gene detection (Only oncodriveCLUST works until now)
+
+    Arguments:
+        file {string} -- A MAF file path
+        folder {string} -- The path for every output file
+
+    Outputs:
+        oncodriveCLUST inputs:
+            oncodriveCLUST.nonsyn.txt
+            oncodriveCLUST.syn.txt
+        oncodriveCLUST output:
+            oncodriveclust_results.tsv
+
+    """    
     def __init__(self, file):
         print(colored(("\nStart Significantly_Mutated_Gene_Detection...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
@@ -493,7 +518,7 @@ class OncoKBAnnotator:
         plt.savefig(folder+"oncokb_actionable_genes.png", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + folder + "oncokb_actionable_genes.png"), 'green'))
 
-
+# 7. HRD score
 class HRDScore:
     def __init__(self, file):
         print(colored(("\nStart analysing HRD Score...."), 'yellow'))
@@ -553,7 +578,7 @@ class HRDScore:
         plt.savefig(folder+"high_HRD_pie.png", dpi=300, bbox_inches='tight')
         print(colored(("=> Generate Pie Plot: " + folder + "high_HRD_pie.png"), 'green'))
 
-
+#8. WGD and CIN
 class WGDnCIN:
     def __init__(self, file):
         print(colored(("\nStart analysing WGD and CIN...."), 'yellow'))
@@ -619,8 +644,3 @@ class WGDnCIN:
         ax.set_yticks(np.arange(0, 1, 0.2))
         plt.savefig(folder+"CIN_Score.png", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + folder + "CIN_Score.png"), 'green'))
-
-
-
-            
-
