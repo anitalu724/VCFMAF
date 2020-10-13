@@ -204,12 +204,15 @@ def main():
 
     # Read TSV file
     print(colored("\nReading TSV file....", "yellow"))
+    flag, category, category_caller = read_tsv(args.file)
     maf_output_list = []
     folder, meta = args.output, args.metafile
     if folder[-1:] != "/":
         folder += "/"
     if meta[-1:] != "/":
         meta += "/"
+
+    
 # Solution 1: VCF
     if flag == "vcf":  
         if not args.combine or not args.vcf2maf:
