@@ -212,7 +212,6 @@ def main():
     if meta[-1:] != "/":
         meta += "/"
 
-    
 # Solution 1: VCF
     if flag == "vcf":  
         if not args.combine or not args.vcf2maf:

@@ -1,0 +1,3 @@
+Same Patient	Copy Number Alteration	Mutation Type	Purity	Mutation Signature	Mutation Clonality	Frequency
+sample_data/tsv/comut_tsv/same_patient.tsv	sample_data/tsv/comut_tsv/copy_number_alterations.tsv					
+		

@@ -41,10 +41,31 @@ python3 maf_analysis.py \
 python3 maf_analysis.py \
 -f sample_data/example/CBCP_oncokb_maf.txt \
 -hrd sample_data/tsv/HRD_tsv/HRD_input.tsv grch37 \
--o sample_data/20200930
+-o sample_data/pic
 
-7.
+8.
 python3 maf_analysis.py \
 -f sample_data/example/CBCP_oncokb_maf.txt \
 -wgdcin sample_data/tsv/HRD_tsv/HRD_input.tsv \
 -o sample_data/20200930
+
+
+testing:
+
+python3 maf_analysis.py \
+-f sample_data/out_20201013/maf_combination.maf \
+-comut \
+-smg \
+-kcga \
+-ms sample_data/pic \
+-tmb nonsynonmous 60456963 \
+-o sample_data/out_20201013
+
+...
+python3 maf_analysis.py \
+-f sample_data/example/CBCP_oncokb_maf.txt \
+-oncokb ../oncokb-annotator/ ca398551-c549-49bd-80f0-0e68d9ca033c 1 sample_data/example/CBCP_oncokb_clinical.txt \
+-wgdcin sample_data/tsv/HRD_tsv/HRD_input.tsv \
+-o sample_data/pic
+
+

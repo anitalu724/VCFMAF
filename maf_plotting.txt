@@ -9,9 +9,9 @@ python3 maf_plotting.py \
 
 
 2. Cosine Similarity
-python3.7 maf_plotting.py \
--cs sample_data/20200911_png/S2S_matrix.csv \
--o sample_data/20200911_png/
+python3 maf_plotting.py \
+-cs sample_data/pic/S2S_matrix.csv \
+-o sample_data/pic/
 
 3. SBS Plot
 python3.7 maf_plotting.py \
@@ -22,3 +22,10 @@ python3.7 maf_plotting.py \
 python3.7 maf_plotting.py \
 -dn sample_data/20200911_png/nmf_res_contribution.csv \
 -o sample_data/20200911_png/
+
+
+testing:
+
+python3 maf_plotting.py \
+-dn sample_data/pic/nmf_res_contribution.csv \
+-o sample_data/pic/
