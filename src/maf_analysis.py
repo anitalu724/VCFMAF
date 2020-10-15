@@ -795,7 +795,7 @@ class NIMFA:
             col = list(df.columns)
             col[0] = "MutationType"
             df.columns = col
-            df.to_csv(folder+"SBS.tsv", "\t")
+            df.to_csv(folder+"SBS.tsv", "\t",index=False)
             sigPlt.plotSBS(folder+"SBS.tsv", folder,"", "96", percentage=True)
             print(colored(("=> Generate SBS Plot: "+folder+"SBS_96_plots_.pdf"), 'green'))
             os.system("rm -rf "+folder+"SBS.tsv\n")
