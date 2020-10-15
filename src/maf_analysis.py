@@ -715,7 +715,6 @@ class NIMFA:
             print(colored("=> Generate input file: ", 'green'))
             print(colored(("   "+output_file), 'green'))
         def estimation():
-            print(colored(("\nStart Estimation...."), 'yellow'))
             os.system("git clone https://github.com/mims-harvard/nimfa.git\n")
             os.chdir("nimfa")
             os.system("python3 setup.py install --user")
@@ -756,6 +755,7 @@ class NIMFA:
             code.write("fig.tight_layout(pad=1.0)\n")
             code.write("plt.savefig(\"../"+pic+"1_estimate.png\",dpi=300,bbox_inches = 'tight')\n")
             code.close()
+            print(colored(("\nStart Estimation...."), 'yellow'))
             p = os.popen("python3 nimfa.py\n")
             x = p.read()
             print(x)
@@ -790,7 +790,7 @@ class NIMFA:
     def plotting(self, folder, pic):
         print(colored(("\nStart Mutational_Signature Plotting...."), 'yellow'))
         def SBSPlot():
-            # import sigProfilerPlotting as sigPlt
+            import sigProfilerPlotting as sigPlt
             df = pd.read_csv(folder+"96_sig.csv")
             col = list(df.columns)
             col[0] = "MutationType"
