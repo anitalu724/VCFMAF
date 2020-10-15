@@ -175,7 +175,7 @@ class CosineSimilarity:
                                cbar_kws={"orientation": "vertical",'shrink':0.5})
         ax.set_title('Cosine Similarity Plot', fontsize=20,weight='bold')
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right',fontweight='light')
-        plt.savefig(folder+"S2S.png",dpi=300)
+        plt.savefig(folder+"S2S.png",dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Cosine Similarity Plot: "+folder+"S2S.png"), 'green'))
 
 

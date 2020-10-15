@@ -35,3 +35,7 @@ python3 maf_plotting.py \
 python3 maf_plotting.py \
 -cmp sample_data/tsv/comut_tsv/comut.tsv sample_data/tsv/comut_tsv/comut_info.tsv 0 comut.png \
 -o sample_data/pic/ 
+
+python3.7 maf_plotting.py \
+-sbs sklearn.csv \
+-o ./

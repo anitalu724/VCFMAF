@@ -17,7 +17,8 @@ from src.maf_analysis import (
     TotalMutationBurden,
     OncoKBAnnotator,
     HRDScore,
-    WGDnCIN
+    WGDnCIN, 
+    NIMFA
 )
 
 
@@ -41,13 +42,22 @@ def main():
                                                            1. The CSV_input file.\n\
                                                            2. The reference for HRD Score.\n")
     parser.add_argument("-wgdcin", "--wgd_cin", nargs=1)
+    parser.add_argument("-nf", "--nimfa", nargs=4, help="Two items must be entered:\n\
+                                                         1. Rank start number\n\
+                                                         2. Rank end number\n\
+                                                         3. Epoch number\n\
+                                                         4. Signature Number\n")
     parser.add_argument("-o","--output",required=True,metavar="OUTPUT folder",help="The path for storing every generated file.\n\
-                                                                                    This path must end with a folder.\n",)
+                                                                                    This path must end with a folder.\n")
+    parser.add_argument("-p", "--picture", required=True,metavar="picture folder" ,help="The path for storing every picture.\n")                                                                        
+    
     args = parser.parse_args()
 
-    folder = args.output
+    folder, pic = args.output, args.picture
     if folder[-1:] != "/":
         folder += "/"
+    if pic[-1:] != "/":
+        pic += "/"
 
     # 1. CoMut Plot Analysis
     if args.comut_analysis:
@@ -89,6 +99,13 @@ def main():
         df = WGDnCIN(args.wgd_cin[0])
         df.data_analysis(folder)
         df.plotting(folder)
+
+    if args.nimfa:
+        df = NIMFA(args.file[0])
+        df.data_analysis(folder, pic,args.nimfa[0], args.nimfa[1],args.nimfa[2],args.nimfa[3])
+        df.plotting(folder, pic)
+        
+
 
 
 if __name__ == "__main__":
