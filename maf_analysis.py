@@ -17,8 +17,7 @@ from src.maf_analysis import (
     TotalMutationBurden,
     OncoKBAnnotator,
     HRDScore,
-    WGDnCIN, 
-    NIMFA
+    WGDnCIN
 )
 
 
@@ -30,7 +29,11 @@ def main():
     parser.add_argument("-comut", "--comut_analysis", action="store_true")
     parser.add_argument("-smg", "--significantly_mutated_gene", action="store_true")
     parser.add_argument("-kcga", "--known_cancer_gene_annotaiton", action="store_true")
-    parser.add_argument("-ms", "--mutational_signature", nargs=1, metavar="figures_folder")
+    parser.add_argument("-ms", "--mutational_signature", nargs=4, help="Two items must be entered:\n\
+                                                         1. Rank start number\n\
+                                                         2. Rank end number\n\
+                                                         3. Epoch number\n\
+                                                         4. Signature Number\n")
     parser.add_argument("-tmb","--total_mutation_burden",nargs=2,help="One item must be entered:\n \
                                                                        1. Sequencing Length\n",)
     parser.add_argument("-oncokb","--oncokb_annotator",nargs=4,help='Three items must be entered:\n \
@@ -42,11 +45,6 @@ def main():
                                                            1. The CSV_input file.\n\
                                                            2. The reference for HRD Score.\n")
     parser.add_argument("-wgdcin", "--wgd_cin", nargs=1)
-    parser.add_argument("-nf", "--nimfa", nargs=4, help="Two items must be entered:\n\
-                                                         1. Rank start number\n\
-                                                         2. Rank end number\n\
-                                                         3. Epoch number\n\
-                                                         4. Signature Number\n")
     parser.add_argument("-o","--output",required=True,metavar="OUTPUT folder",help="The path for storing every generated file.\n\
                                                                                     This path must end with a folder.\n")
     parser.add_argument("-p", "--picture", required=True,metavar="picture folder" ,help="The path for storing every picture.\n")                                                                        
@@ -75,9 +73,9 @@ def main():
     # 4. Mutational signature
     if args.mutational_signature:
         df = MutationalSignature(args.file[0])
-        if args.mutational_signature[0][-1:] != "/":
-            args.mutational_signature[0] += "/"
-        df.data_analysis(folder, args.mutational_signature[0])
+        df.data_analysis(folder, pic,args.mutational_signature[0], args.mutational_signature[1],args.mutational_signature[2],args.mutational_signature[3])
+        df.plotting(folder, pic)
+        
     # 5. Mutation burden statistics
     if args.total_mutation_burden:
         df = TotalMutationBurden(args.file[0])
@@ -99,11 +97,6 @@ def main():
         df = WGDnCIN(args.wgd_cin[0])
         df.data_analysis(folder)
         df.plotting(folder)
-
-    if args.nimfa:
-        df = NIMFA(args.file[0])
-        df.data_analysis(folder, pic,args.nimfa[0], args.nimfa[1],args.nimfa[2],args.nimfa[3])
-        df.plotting(folder, pic)
         
 
 

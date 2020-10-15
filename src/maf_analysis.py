@@ -10,7 +10,6 @@ from .maf_filter import *
 import pandas as pd
 import numpy as np
 from termcolor import colored
-
 import time
 import os
 import math
@@ -18,6 +17,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.style
 from matplotlib.ticker import MaxNLocator
+
+COLOR_MAP = ['#266199','#b7d5ea','#acc6aa','#E0CADB','#695D73','#B88655','#DDDDDD','#71a0a5','#841D22','#E08B69']
 
 
 # 1. CoMut Plot Analysis
@@ -106,7 +107,6 @@ class SigMutatedGeneDetection:
             oncodriveCLUST.syn.txt
         oncodriveCLUST output:
             oncodriveclust_results.tsv
-
     """    
     def __init__(self, file):
         print(colored(("\nStart Significantly_Mutated_Gene_Detection...."), 'yellow'))
@@ -250,7 +250,7 @@ class MutationalSignature:
     def __init__(self, file):
         print(colored(("\nStart Mutational_Signature...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder, fig_folder):
+    def data_analysis(self, folder, pic, rank1, rank2, epoch, sig):
         def get_input_file():
             output_file = folder+"ms_input.tsv"
             selected_col = self.df[['Tumor_Sample_Barcode','flanking_bps', 'Reference_Allele', 'Tumor_Seq_Allele2']]
@@ -313,98 +313,172 @@ class MutationalSignature:
             new_df.to_csv(output_file, sep = '\t', index = True)
             print(colored("=> Generate input file: ", 'green'))
             print(colored(("   "+output_file), 'green'))
-        def run_r_estimation():
-            input_file = folder+"ms_input.tsv"
-            code_file = fig_folder+"estimation.r"
-            img_file = fig_folder+"1_Estimation.png"
-            path = os.path.abspath(input_file)
-            img_path = os.path.abspath(img_file)
-            code = open(code_file, "w")
-            code.write("library(BSgenome)\nlibrary(MutationalPatterns)\nlibrary(NMF)\n")
-            code.write("file_path <- "+"\""+path+"\"\n")
-            code.write("data <- read.table(file_path, header = TRUE, stringsAsFactors = FALSE)\n")
-            # 1_Estimate
-            code.write("png(filename=\""+img_path+"\",width = 1000, height = 1000)\n")
-            code.write("data <- data+0.0001\n")
-            code.write("estimate <- nmf(data, rank=2:5, method=\"brunet\", nrun=10, seed=123456)\n")
-            code.write("plot(estimate)\ndev.off()\n")
-            #  os.system("bash Install_script/install_r_estimation.sh")
-            os.popen("Rscript "+ code_file+" | head\n")
+        def estimation():
+            os.system("git clone https://github.com/mims-harvard/nimfa.git\n")
+            os.chdir("nimfa")
+            os.system("python3 setup.py install --user")
+            code = open("nimfa.py", "w")
+            code.write("import nimfa\nfrom collections import defaultdict, Counter\nimport urllib\nimport numpy as np\nfrom matplotlib import pyplot as plt\nimport matplotlib.gridspec as gridspec\nfrom sklearn import preprocessing\nimport scipy.cluster.hierarchy as sch\nimport pandas as pd\n")
+            code.write("df = (pd.read_csv(\"../"+folder+"ms_input.tsv\", sep=\"\t\")).T\n")
+            code.write("data = (df.to_numpy())[1:]\n")
+            code.write("rank_cands = range("+rank1+","+ rank2+", 1)\n")
+            code.write("snmf = nimfa.Snmf(data, seed='random_vcol', max_iter=100)\n")
+            code.write("summary = snmf.estimate_rank(rank_range=rank_cands, n_run="+epoch+", what='all')\n")
+            
+            code.write("rss = [summary[rank]['rss'] for rank in rank_cands]\n")
+            code.write("coph = [summary[rank]['cophenetic'] for rank in rank_cands]\n")
+            code.write("disp = [summary[rank]['dispersion'] for rank in rank_cands]\n")
+            code.write("spar = [summary[rank]['sparseness'] for rank in rank_cands]\n")
+            code.write("spar_w, spar_h = zip(*spar)\n")
+            code.write("evar = [summary[rank]['evar'] for rank in rank_cands]\n")
+            
+            code.write("fig, axs = plt.subplots(2, 3, figsize=(12,8))\n")
+            code.write("axs[0,0].plot(rank_cands, rss, 'o-', color='#266199', label='RSS', linewidth=1.5)\n")
+            code.write("axs[0,0].set_title('RSS', fontsize=12,fontweight='bold')\n")
+            code.write("axs[0,0].tick_params(axis='both', labelsize=8)\n")
+            code.write("axs[0,1].plot(rank_cands, coph, 'o-', color='#695D73', label='Cophenetic correlation', linewidth=1.5)\n")
+            code.write("axs[0,1].set_title('Cophenetic', fontsize=12,fontweight='bold')\n")
+            code.write("axs[0,1].tick_params(axis='both', labelsize=8)\n")
+            code.write("axs[0,2].plot(rank_cands, disp,'o-', color='#71a0a5', label='Dispersion', linewidth=1.5)\n")
+            code.write("axs[0,2].set_title('Dispersion', fontsize=12,fontweight='bold')\n")
+            code.write("axs[0,2].tick_params(axis='both', labelsize=8)\n")
+            code.write("axs[1,0].plot(rank_cands, spar_w, 'o-', color='#B88655', label='Sparsity (Basis)', linewidth=1.5)\n")
+            code.write("axs[1,0].set_title('Sparsity (Basis)', fontsize=12,fontweight='bold')\n")
+            code.write("axs[1,0].tick_params(axis='both', labelsize=8)\n")
+            code.write("axs[1,1].plot(rank_cands, spar_h, 'o-', color='#E08B69', label='Sparsity (Mixture)', linewidth=1.5)\n")
+            code.write("axs[1,1].set_title('Sparsity (Mixture)', fontsize=12,fontweight='bold')\n")
+            code.write("axs[1,1].tick_params(axis='both', labelsize=8)\n")
+            code.write("axs[1,2].plot(rank_cands, evar,  'o-', color='#841D22', label='Explained variance', linewidth=1.5)\n")
+            code.write("axs[1,2].set_title('Explained variance', fontsize=12,fontweight='bold')\n")
+            code.write("axs[1,2].tick_params(axis='both', labelsize=8)\n")
+            code.write("fig.tight_layout(pad=1.0)\n")
+            code.write("plt.savefig(\"../"+pic+"Estimation.png\",dpi=300,bbox_inches = 'tight')\n")
+            code.close()
+            print(colored(("\nStart Estimation(may need a few minutes)...."), 'yellow'))
+            p = os.popen("python3 nimfa.py\n")
+            x = p.read()
+            print(x)
+            p.close()
             print(colored("=> Generate estimation figure: ", 'green'))
-            print(colored(("   "+img_file), 'green'))
-        def run_r_signature():
-            input_file = folder+"ms_input.tsv"
-            code_file = fig_folder+"signature.r"
-            img_file = fig_folder+"1_Estimation.png"
-            img_file1 = fig_folder+"2_Signature_96.png"
-            img_file2 = fig_folder+"3_Signature_Distribution.png"
-            img_heat = fig_folder+"4_Signature2sample_Heatmap.png" 
-            img_compare = fig_folder+"5_Similarity_Comparison.png"
-            img_sig_heat = fig_folder+"6_Signature_Similarity_heatmap.png"
-            c_path = fig_folder+"nmf_res_contribution.csv"
-            s_path = fig_folder+"nmf_res_signature.csv"
-            m_path = fig_folder+"S2S_matrix.csv"
-            rank = "4"#input("Input number of signatures: ")
-            sig_list = [("Signature_"+str(i)) for i in range(int(rank))]
-            new_str = ""
-            for i in range(len(sig_list)):
-                new_str+=("\""+sig_list[i]+"\"")
-                if i != (len(sig_list)-1):
-                    new_str+=","
-            code = open(code_file, "w")
-            code.write("library(BSgenome)\nlibrary(MutationalPatterns)\nlibrary(NMF)\nlibrary(\"gridExtra\")\n")
-            code.write("file_path <- "+"\""+os.path.abspath(input_file)+"\"\n")
-            code.write("data <- read.table(file_path, header = TRUE, stringsAsFactors = FALSE)\n")
-            code.write("data <- data+0.0001\n")
-            # 2_Signature_96
-            code.write("nmf_res <- extract_signatures(data, rank = "+rank+", nrun = 10)\n")
-            code.write("colnames(nmf_res$signatures) <- c("+new_str+")\n")
-            code.write("rownames(nmf_res$contribution) <- c("+new_str+")\n")
-            code.write("png(filename=\""+os.path.abspath(img_file1)+"\",width = 1000, height = 1000)\n")
-            code.write("plot_96_profile(nmf_res$signatures, condensed = TRUE)\ndev.off()\n")
-            # 3_Signature_distribution
-            code.write("pc1 <- plot_contribution(nmf_res$contribution, nmf_res$signature,mode = \"relative\")\n")
-            code.write("pc2 <- plot_contribution(nmf_res$contribution, nmf_res$signature,mode = \"absolute\")\n")
-            code.write("png(filename=\""+os.path.abspath(img_file2)+"\",width = 1000, height = 1000)\n")
-            code.write("a <- grid.arrange(pc1, pc2)\nplot(a)\ndev.off()\n")
-            # 4_Signature2sample_heatmap
-            code.write("png(filename=\""+os.path.abspath(img_heat)+"\",width = 1000, height = 1000)\n")
-            code.write("pch1 <- plot_contribution_heatmap(nmf_res$contribution,sig_order = c("+new_str+"))\n")
-            code.write("pch2 <- plot_contribution_heatmap(nmf_res$contribution, cluster_samples=FALSE)\n")
-            code.write("grid.arrange(pch1, pch2, ncol = 2, widths = c(2,1.6))\ndev.off()\n")
-            # 5_Similarity_Comparison
-            code.write("png(filename=\""+os.path.abspath(img_compare)+"\",width = 1000, height = 1000)\n")
-            code.write("plot_compare_profiles(data[,1],nmf_res$reconstructed[,1],profile_names = c(\"Original\", \"Reconstructed\"),condensed = TRUE)\ndev.off()\n")
-            # 6_Signature_Similarity_heatmap
-            code.write("sp_url <- paste(\"https://cancer.sanger.ac.uk/cancergenome/assets/\",\"signatures_probabilities.txt\", sep = \"\")\n")
-            code.write("cancer_signatures = read.table(sp_url, sep = \"\t\", header = TRUE)\n")
-            code.write("new_order = match(row.names(data), cancer_signatures$Somatic.Mutation.Type)\n")
-            code.write("cancer_signatures = cancer_signatures[as.vector(new_order),]\n")
-            code.write("row.names(cancer_signatures) = cancer_signatures$Somatic.Mutation.Type\n")
-            code.write("cancer_signatures = as.matrix(cancer_signatures[,4:33])\n")
-            code.write("hclust_cosmic = cluster_signatures(cancer_signatures, method = \"average\")\n")
-            code.write("cosmic_order = colnames(cancer_signatures)[hclust_cosmic$order]\n")
-            code.write("cos_sim_samples_signatures = cos_sim_matrix(nmf_res$signature, cancer_signatures)\n")
-            code.write("png(filename=\""+os.path.abspath(img_sig_heat)+"\",width = 800, height = 600)\n")
-            code.write("plot_cosine_heatmap(cos_sim_samples_signatures,col_order = cosmic_order,cluster_rows = TRUE)\ndev.off()\n")
-            # back_up references
-            code.write("write.csv(nmf_res$contribution,file=\""+os.path.abspath(c_path)+"\",sep=\",\",row.names=T, na = \"NA\")\n")
-            code.write("write.csv(nmf_res$signature,file=\""+os.path.abspath(s_path)+"\",sep=\",\",row.names=T, na = \"NA\")\n")
-            code.write("write.csv(cos_sim_matrix(nmf_res$signatures,cancer_signatures),file=\""+os.path.abspath(m_path)+"\",sep=\",\",row.names=T, na = \"NA\")\n")
-            os.popen("Rscript "+ code_file+" | head\n")
-            print(colored("=> Generate signature figures: ", 'green'))
-            print(colored(("   "+img_file1), 'green'))
-            print(colored(("   "+img_file2), 'green'))
-            print(colored(("   "+img_heat), 'green'))
-            print(colored(("   "+img_compare), 'green'))
-            print(colored(("   "+img_sig_heat), 'green'))
-            print(colored("=> Generate NMF references CSV files:", 'green'))
-            print(colored(("   "+c_path), 'green'))
-            print(colored(("   "+s_path), 'green'))
-            print(colored(("   "+m_path), 'green'))
+            print(colored(("   "+pic+"Estimation.png\n"), 'green'))
+            os.chdir("..")
+            os.system("rm -rf nimfa\n")
+        def nmf():
+            print(colored(("\nStart NMF...."), 'yellow'))
+            from sklearn.decomposition import NMF
+            df = (pd.read_csv(folder+"ms_input.tsv", sep="\t")).T
+            sample_list = df.index[1:]
+            index_96 = df.to_numpy()[0]
+            data = (df.to_numpy())[1:]
+            model = NMF(n_components=int(sig),init='random', random_state=0)
+            W = model.fit_transform(data)
+            H = model.components_
+            Hdf, Wdf = pd.DataFrame(H.T), pd.DataFrame(W.T)
+            Hdf.columns = ["Signature_"+str(i) for i in range(int(sig))]
+            Wdf.columns = sample_list
+            Hdf.index = index_96
+            Wdf.index = ["Signature_"+str(i) for i in range(int(sig))]
+            Hdf.to_csv(folder+"96_sig.csv")
+            Wdf.to_csv(folder+"sig_sample.csv")
+            print(colored("=> Generate file: ", 'green'))
+            print(colored(("   "+folder+"96_sig.csv"), 'green'))
+            print(colored(("   "+folder+"sig_sample.csv"), 'green'))
         get_input_file()
-        run_r_estimation()
-        run_r_signature()
+        estimation()
+        nmf()
+    def plotting(self, folder, pic):
+        print(colored(("\nStart Mutational_Signature Plotting...."), 'yellow'))
+        def SBSPlot():
+            import sigProfilerPlotting as sigPlt
+            df = pd.read_csv(folder+"96_sig.csv")
+            col = list(df.columns)
+            col[0] = "MutationType"
+            df.columns = col
+            df.to_csv(folder+"SBS.tsv", "\t",index=False)
+            sigPlt.plotSBS(folder+"SBS.tsv", pic,"", "96", percentage=True)
+            print(colored(("=> Generate SBS Plot: "+pic+"SBS_96_plots_.pdf"), 'green'))
+            os.system("rm -rf "+folder+"SBS.tsv\n")
+        def SigDistribution():
+            df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
+            sample_list = list(df.columns)
+            sig_list = list(df.index)
+            SUM = (df.sum(axis = 0, skipna = True)).tolist()
+            df = df/SUM
+            ind = np.arange(df.shape[1])
+            data = []
+            for i in range(df.shape[0]):
+                d = tuple(df.iloc[i].tolist())
+                data.append(d)
+            fig = plt.figure(figsize=(12, 8))
+            ax = fig.add_axes([0,0,1,1])
+            for i in range(len(data)):
+                if i == 0:
+                    ax.bar(ind, data[i], 0.8, color = COLOR_MAP[i])
+                else:
+                    b = np.array(data[0])
+                    for k in range(1,i):
+                        b = b+np.array(data[k])
+                    ax.bar(ind, data[i], 0.8, bottom=b,color = COLOR_MAP[i])
+            ax.set_title('Relative Contribution',fontsize=18, fontweight='bold')
+            plt.xticks(ind, sample_list,rotation=45,horizontalalignment='right',fontweight='light',fontsize=10)
+            ax.set_yticks(np.arange(0, 1+0.1, 0.25))
+            ax.legend(title="Signature",labels=sig_list,loc='center right', bbox_to_anchor=(1.13, 0.5))
+            plt.savefig(pic+"SigContribution.png", dpi=300,bbox_inches='tight')
+            print(colored(("=> Generate Bar Plot: " + pic+"SigContribution.png"), 'green')) 
+            
+            height, length = len(sig_list), len(sample_list)  
+            h_data = np.array(df.to_numpy())
+            f,ax = plt.subplots(figsize=(12,6))
+            ax = sns.heatmap(data, vmin=0, vmax=1, xticklabels =sample_list, yticklabels = sig_list, 
+                             square=True, cmap="Blues",
+                             cbar_kws={"orientation": "vertical",'shrink':0.5})
+            ax.set_title('Signature Sample Heatmap', fontsize=18,weight='bold')
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right',fontweight='light',fontsize=10)
+            plt.savefig(pic+"SigSamHeatmap.png",dpi=300,bbox_inches='tight')
+            print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.png"), 'green'))
+        def CosineSimilarity():
+            from sklearn.metrics.pairwise import cosine_similarity
+            my_file, aux_file = folder+"96_sig.csv", "src/auxiliary_file/COSMIC_72.tsv"
+            my_df, aux_df = pd.read_csv(my_file, index_col=0), pd.read_csv(aux_file, sep="\t",index_col=0)
+            my_list, aux_list = my_df.columns, aux_df.columns
+            X = np.array(my_df.T.to_numpy())
+            Y = np.array(aux_df.T.to_numpy())
+            M = cosine_similarity(X, Y, dense_output=True)
+            Mdf= pd.DataFrame(M)
+            Mdf.index, Mdf.columns = my_list, aux_list
+            Mdf.to_csv(folder+"SBS.tsv", sep="\t")
+            print(colored("=> Generate file: ", 'green'))
+            print(colored(("   "+folder+"SBS.tsv"), 'green'))
+            height, length = len(my_list), len(aux_list)
+            f, ax = plt.subplots(figsize=(20,6))
+            ax = sns.heatmap(M, vmin=0, vmax=1, xticklabels =aux_list, yticklabels = my_list, square=True, 
+                                cmap="Blues",cbar_kws={"orientation": "vertical",'shrink':0.5})
+            ax.set_title('Cosine Similarity Plot',fontsize=18,weight='bold')
+            ax.set_xticklabels(ax.get_xticklabels(),rotation=45, horizontalalignment='right',fontweight='light', fontsize=7)
+            ax.set_yticklabels(ax.get_yticklabels(),fontweight='light', fontsize=7)
+            plt.ylim(bottom=0, top=height+0.5)
+            plt.savefig(pic+"S2S.png",dpi=300,bbox_inches='tight')
+            plt.clf()
+            print(colored(("=> Generate Cosine Similarity Plot: "+pic+"S2S.png"), 'green'))  
+        def DonutPlot():
+            import matplotlib.pyplot as pltd
+            df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
+            raw_data = df.sum(axis=1)/df.shape[1]
+            SUM = raw_data.sum(axis=0)
+            raw_data = raw_data/SUM
+            names, sizes = list(raw_data.index), list(raw_data.iloc[:])
+            fig, ax = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
+            wedges, texts, autotexts = ax.pie(sizes, colors=COLOR_MAP[:len(names)], autopct='%1.1f%%',textprops={'fontsize': 6},radius=1.2, pctdistance=1.15)
+            leg = ax.legend(wedges, list(df.index),title_fontsize=8,fontsize=6,title='Signature',loc="center left",bbox_to_anchor=(1.05,0.5))
+            p = plt.gcf()
+            my_circle = plt.Circle( (0,0), 0.72, color='white')
+            p.gca().add_artist(my_circle)
+            p.savefig(pic+"Donut_plot.png", dpi=300,bbox_inches='tight')
+            print(colored(("=> Generate Donut Plot: "+pic+"Donut_plot.png"), 'green'))
+        SBSPlot()
+        SigDistribution()
+        CosineSimilarity()
+        DonutPlot()
 
 
 # 5. Mutation burden statistics
@@ -644,201 +718,4 @@ class WGDnCIN:
         ax.set_yticks(np.arange(0, 1, 0.2))
         plt.savefig(folder+"CIN_Score.png", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + folder + "CIN_Score.png"), 'green'))
-
-
-#9 nimfa
-class NIMFA:
-    def __init__(self, file):
-        print(colored(("\nStart Mutational_Signature...."), 'yellow'))
-        self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder, pic, rank1, rank2, epoch, sig):
-        def get_input_file():
-            output_file = folder+"ms_input.tsv"
-            selected_col = self.df[['Tumor_Sample_Barcode','flanking_bps', 'Reference_Allele', 'Tumor_Seq_Allele2']]
-            selected_col.columns = ['SampleID', 'Three_Allele', 'Ref', 'Mut']
-            new_dict = {}
-            for i in range(len(selected_col['SampleID'])):
-                if selected_col['SampleID'][i] not in new_dict:
-                    new_dict[selected_col['SampleID'][i]] = [selected_col.loc[i, :]]
-                else:
-                    new_dict[selected_col['SampleID'][i]].append(selected_col.loc[i, :])
-            # rearrange each data 
-            for sampleID in new_dict:
-                sample_dict = {'C>A':[],'C>G':[],'C>T':[],'T>A':[],'T>C':[],'T>G':[]}#,'OTHER':[]}
-                for item in new_dict[sampleID]:
-                    if (item['Ref'] == 'C' and item['Mut'] == 'A') or (item['Ref'] == 'G' and item['Mut'] == 'T'):
-                        sample_dict['C>A'].append(item)
-                    elif (item['Ref'] == 'C' and item['Mut'] == 'G') or (item['Ref'] == 'G' and item['Mut'] == 'C'):
-                        sample_dict['C>G'].append(item)
-                    elif (item['Ref'] == 'C' and item['Mut'] == 'T') or (item['Ref'] == 'G' and item['Mut'] == 'A'):
-                        sample_dict['C>T'].append(item)
-                    elif (item['Ref'] == 'T' and item['Mut'] == 'A') or (item['Ref'] == 'A' and item['Mut'] == 'T'):
-                        sample_dict['T>A'].append(item)
-                    elif (item['Ref'] == 'T' and item['Mut'] == 'C') or (item['Ref'] == 'A' and item['Mut'] == 'G'):
-                        sample_dict['T>C'].append(item)
-                    elif (item['Ref'] == 'T' and item['Mut'] == 'G') or (item['Ref'] == 'A' and item['Mut'] == 'C'):
-                        sample_dict['T>G'].append(item)
-                list_96 = []
-                for data in sample_dict:
-                    # data = ['C>A', 'C>G', 'C>T', 'T>A', 'T>C', 'T>G']
-                    if data != "OTHER":
-                        new_list = [int(0)]*16
-                        three_allele_dict = {}
-                        if data in ['C>A', 'C>G', 'C>T']:
-                            three_allele_dict={"ACA":0,     "TGT":0,    "ACC":1,    "TGG":1,    "ACG":2,    "TGC":2,    "ACT":3,    "TGA":3, \
-                                               "CCA":4,     "GGT":4,    "CCC":5,    "GGG":5,    "CCG":6,    "GGC":6,    "CCT":7,    "GGA":7, \
-                                               "GCA":8,     "CGT":8,    "GCC":9,    "CGG":9,    "GCG":10,   "CGC":10,   "GCT":11,   "CGA":11,\
-                                               "TCA":12,    "AGT":12,   "TCC":13,   "AGG":13,   "TCG":14,   "AGC":14,   "TCT":15,   "AGA":15 }   
-                        elif data in ['T>A', 'T>C', 'T>G']:
-                            three_allele_dict={"ATA":0,     "TAT":0,    "ATC":1,    "TAG":1,    "ATG":2,    "TAC":2,    "ATT":3,    "TAA":3, \
-                                               "CTA":4,     "GAT":4,    "CTC":5,    "GAG":5,    "CTG":6,    "GAC":6,    "CTT":7,    "GAA":7, \
-                                               "GTA":8,     "CAT":8,    "GTC":9,    "CAG":9,    "GTG":10,   "CAC":10,   "GTT":11,   "CAA":11,\
-                                               "TTA":12,    "AAT":12,   "TTC":13,   "AAG":13,   "TTG":14,   "AAC":14,   "TTT":15,   "AAA":15 }   
-                        for j in sample_dict[data]:
-                            # print(j['Three_Allele'])
-                            if j['Three_Allele'] in three_allele_dict:
-                                new_list[three_allele_dict[j['Three_Allele']]]+=1
-                        for each_num in new_list:
-                            list_96.append(each_num)
-                new_dict[sampleID] = list_96
-            new_df = pd.DataFrame.from_dict(new_dict)
-            list_a = ["A.A", "A.C", "A.G", "A.T", "C.A", "C.C", "C.G", "C.T",\
-                      "G.A", "G.C", "G.G", "G.T", "T.A", "T.C", "T.G", "T.T"]
-            list_b = ['C>A', 'C>G', 'C>T', 'T>A', 'T>C', 'T>G']
-            new_row_name = []
-            for item in list_b:
-                for allele in list_a:
-                    new_str = allele[0]+"["+item+"]"+allele[2]
-                    new_row_name.append(new_str)
-            new_df.index = new_row_name
-            new_df.to_csv(output_file, sep = '\t', index = True)
-            print(colored("=> Generate input file: ", 'green'))
-            print(colored(("   "+output_file), 'green'))
-        def estimation():
-            os.system("git clone https://github.com/mims-harvard/nimfa.git\n")
-            os.chdir("nimfa")
-            os.system("python3 setup.py install --user")
-            code = open("nimfa.py", "w")
-            code.write("import nimfa\nfrom collections import defaultdict, Counter\nimport urllib\nimport numpy as np\nfrom matplotlib import pyplot as plt\nimport matplotlib.gridspec as gridspec\nfrom sklearn import preprocessing\nimport scipy.cluster.hierarchy as sch\nimport pandas as pd\n")
-            code.write("df = (pd.read_csv(\"../"+folder+"ms_input.tsv\", sep=\"\t\")).T\n")
-            code.write("data = (df.to_numpy())[1:]\n")
-            code.write("rank_cands = range("+rank1+","+ rank2+", 1)\n")
-            code.write("snmf = nimfa.Snmf(data, seed='random_vcol', max_iter=100)\n")
-            code.write("summary = snmf.estimate_rank(rank_range=rank_cands, n_run="+epoch+", what='all')\n")
-            
-            code.write("rss = [summary[rank]['rss'] for rank in rank_cands]\n")
-            code.write("coph = [summary[rank]['cophenetic'] for rank in rank_cands]\n")
-            code.write("disp = [summary[rank]['dispersion'] for rank in rank_cands]\n")
-            code.write("spar = [summary[rank]['sparseness'] for rank in rank_cands]\n")
-            code.write("spar_w, spar_h = zip(*spar)\n")
-            code.write("evar = [summary[rank]['evar'] for rank in rank_cands]\n")
-            
-            code.write("fig, axs = plt.subplots(2, 3, figsize=(12,8))\n")
-            code.write("axs[0,0].plot(rank_cands, rss, 'o-', color='#266199', label='RSS', linewidth=1.5)\n")
-            code.write("axs[0,0].set_title('RSS', fontsize=12,fontweight='bold')\n")
-            code.write("axs[0,0].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[0,1].plot(rank_cands, coph, 'o-', color='#695D73', label='Cophenetic correlation', linewidth=1.5)\n")
-            code.write("axs[0,1].set_title('Cophenetic', fontsize=12,fontweight='bold')\n")
-            code.write("axs[0,1].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[0,2].plot(rank_cands, disp,'o-', color='#71a0a5', label='Dispersion', linewidth=1.5)\n")
-            code.write("axs[0,2].set_title('Dispersion', fontsize=12,fontweight='bold')\n")
-            code.write("axs[0,2].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[1,0].plot(rank_cands, spar_w, 'o-', color='#B88655', label='Sparsity (Basis)', linewidth=1.5)\n")
-            code.write("axs[1,0].set_title('Sparsity (Basis)', fontsize=12,fontweight='bold')\n")
-            code.write("axs[1,0].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[1,1].plot(rank_cands, spar_h, 'o-', color='#E08B69', label='Sparsity (Mixture)', linewidth=1.5)\n")
-            code.write("axs[1,1].set_title('Sparsity (Mixture)', fontsize=12,fontweight='bold')\n")
-            code.write("axs[1,1].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[1,2].plot(rank_cands, evar,  'o-', color='#841D22', label='Explained variance', linewidth=1.5)\n")
-            code.write("axs[1,2].set_title('Explained variance', fontsize=12,fontweight='bold')\n")
-            code.write("axs[1,2].tick_params(axis='both', labelsize=8)\n")
-            code.write("fig.tight_layout(pad=1.0)\n")
-            code.write("plt.savefig(\"../"+pic+"1_estimate.png\",dpi=300,bbox_inches = 'tight')\n")
-            code.close()
-            print(colored(("\nStart Estimation...."), 'yellow'))
-            p = os.popen("python3 nimfa.py\n")
-            x = p.read()
-            print(x)
-            p.close()
-            print(colored("=> Generate estimation figure: ", 'green'))
-            print(colored(("   "+pic+"1_estimate.png\n"), 'green'))
-            os.chdir("..")
-            os.system("rm -rf nimfa\n")
-        def nmf():
-            print(colored(("\nStart NMF...."), 'yellow'))
-            from sklearn.decomposition import NMF
-            df = (pd.read_csv(folder+"ms_input.tsv", sep="\t")).T
-            sample_list = df.index[1:]
-            index_96 = df.to_numpy()[0]
-            data = (df.to_numpy())[1:]
-            model = NMF(n_components=int(sig),init='random', random_state=0)
-            W = model.fit_transform(data)
-            H = model.components_
-            Hdf, Wdf = pd.DataFrame(H.T), pd.DataFrame(W.T)
-            Hdf.columns = ["Signature_"+str(i) for i in range(int(sig))]
-            Wdf.columns = sample_list
-            Hdf.index = index_96
-            Wdf.index = ["Signature_"+str(i) for i in range(int(sig))]
-            Hdf.to_csv(folder+"96_sig.csv")
-            Wdf.to_csv(folder+"sig_sample.csv")
-            print(colored("=> Generate file: ", 'green'))
-            print(colored(("   "+folder+"96_sig.csv"), 'green'))
-            print(colored(("   "+folder+"sig_sample.csv"), 'green'))
-        get_input_file()
-        estimation()
-        nmf()
-    def plotting(self, folder, pic):
-        print(colored(("\nStart Mutational_Signature Plotting...."), 'yellow'))
-        def SBSPlot():
-            import sigProfilerPlotting as sigPlt
-            df = pd.read_csv(folder+"96_sig.csv")
-            col = list(df.columns)
-            col[0] = "MutationType"
-            df.columns = col
-            df.to_csv(folder+"SBS.tsv", "\t",index=False)
-            sigPlt.plotSBS(folder+"SBS.tsv", folder,"", "96", percentage=True)
-            print(colored(("=> Generate SBS Plot: "+folder+"SBS_96_plots_.pdf"), 'green'))
-            os.system("rm -rf "+folder+"SBS.tsv\n")
-        def SigDistribution():
-            color_map = ['#266199','#b7d5ea','#acc6aa','#E0CADB','#695D73','#B88655','#DDDDDD','#71a0a5','#841D22','#E08B69']
-            df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
-            sample_list = list(df.columns)
-            sig_list = list(df.index)
-            SUM = (df.sum(axis = 0, skipna = True)).tolist()
-            df = df/SUM
-            ind = np.arange(df.shape[1])
-            data = []
-            for i in range(df.shape[0]):
-                d = tuple(df.iloc[i].tolist())
-                data.append(d)
-            fig = plt.figure(figsize=(12, 8))
-            ax = fig.add_axes([0,0,1,1])
-            for i in range(len(data)):
-                if i == 0:
-                    ax.bar(ind, data[i], 0.8, color = color_map[i])
-                else:
-                    b = np.array(data[0])
-                    for k in range(1,i):
-                        b = b+np.array(data[k])
-                    ax.bar(ind, data[i], 0.8, bottom=b,color = color_map[i])
-            ax.set_title('Relative Contribution',fontsize=18, fontweight='bold')
-            plt.xticks(ind, sample_list,rotation=45,horizontalalignment='right',fontweight='light',fontsize=10)
-            ax.set_yticks(np.arange(0, 1+0.1, 0.25))
-            ax.legend(title="Signature",labels=sig_list,loc='center right', bbox_to_anchor=(1.13, 0.5))
-            plt.savefig(pic+"SigContribution.png", dpi=300,bbox_inches='tight')
-            print(colored(("=> Generate Bar Plot: " + pic+"SigContribution.png"), 'green')) 
-            
-            height, length = len(sig_list), len(sample_list)  
-            h_data = np.array(df.to_numpy())
-            f,ax = plt.subplots(figsize=(12,6))
-            ax = sns.heatmap(data, vmin=0, vmax=1, xticklabels =sample_list, yticklabels = sig_list, 
-                             square=True, cmap="Blues",
-                             cbar_kws={"orientation": "vertical",'shrink':0.5})
-            ax.set_title('Signature Sample Heatmap', fontsize=18,weight='bold')
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right',fontweight='light',fontsize=10)
-            plt.savefig(pic+"SigSamHeatmap.png",dpi=300,bbox_inches='tight')
-            print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.png"), 'green'))
-        SBSPlot()
-        SigDistribution()
-
 

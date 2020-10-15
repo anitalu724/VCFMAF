@@ -159,58 +159,7 @@ class CoMutPlot:
         print(colored(("=> Generate CoMut Plot: "+folder+name), 'green'))
 
 
-class CosineSimilarity:
-    def __init__(self, file):
-        print(colored(("\nStart plotting Cosine Similarity Heatmap...."), 'yellow'))
-        self.df = (pd.read_csv(file, header = 0, index_col=0))
-        self.x_label = list(self.df.columns)
-        self.y_label = list(self.df.index)
-    def plot(self, folder):
-        height, length = len(self.y_label), len(self.x_label)
-        h , l = int(height/4 + 1)*3, int(length/6 + 1)*3
-        data = np.array(self.df.to_numpy())
-        f, ax = plt.subplots(figsize=(l,h))
-        ax = sns.heatmap(data, vmin=0, vmax=1, xticklabels =self.x_label, yticklabels = self.y_label, 
-                               square=True, cmap="Blues",
-                               cbar_kws={"orientation": "vertical",'shrink':0.5})
-        ax.set_title('Cosine Similarity Plot', fontsize=20,weight='bold')
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right',fontweight='light')
-        plt.savefig(folder+"S2S.png",dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Cosine Similarity Plot: "+folder+"S2S.png"), 'green'))
-
-
-class SBSPlot:
-    def __init__(self, file, folder):
-        print(colored(("\nStart plotting SBS Plot...."), 'yellow'))
-        self.df = pd.read_csv(file)
-        col = list(self.df.columns)
-        col[0]='MutationType'
-        self.df.columns = col
-        (self.df).to_csv(folder+"SBS.tsv", sep="\t", index=False)     
-    def plot(self, folder):
-        sigPlt.plotSBS(folder+"SBS.tsv", folder,"", "96", percentage=True)
-        print(colored(("=> Generate SBS Plot: "+folder+"SBS_96_plots_.pdf"), 'green'))
-
-
-class DonutPlot:
-    def __init__(self, file):
-        print(colored(("\nStart plotting Donut Plot...."), 'yellow'))
-        self.df = pd.read_csv(file, index_col=0)
-    def plot(self, folder):
-        raw_data = self.df.sum(axis=1)/self.df.shape[1]
-        SUM = raw_data.sum(axis=0)
-        raw_data = raw_data/SUM
-        names, sizes = list(raw_data.index), list(raw_data.iloc[:])
-        color_map = ['#b7d5ea','#acc6aa','#266199','#E0CADB','#695D73','#B88655','#DDDDDD','#71a0a5','#841D22']
-        my_circle = plt.Circle( (0,0), 0.6, color='white')
-        plt.pie(sizes, labels=names, colors=color_map[:len(names)], autopct='%1.1f%%',textprops={'fontsize': 12},radius=1, pctdistance=1-0.4/2)
-        
-        p = plt.gcf()
-        p.gca().add_artist(my_circle)
-        plt.savefig(folder+"donut_plot.png", dpi=300)
-        print(colored(("=> Generate Donut Plot: "+folder+"donut_plot.png"), 'green'))
 
 
 
- 
-        
+

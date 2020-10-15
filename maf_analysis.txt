@@ -19,11 +19,14 @@ python3 maf_analysis.py \
 -kcga \
 -o sample_data/20200828_analysis
 
-4. 
+
+4. Mutational Signature
 python3 maf_analysis.py \
--f sample_data/20200822_result/maf_combination.maf \
--ms sample_data/20200911_png \
--o sample_data/20200828_analysis
+-f sample_data/out_20201013/maf_combination.maf \
+-ms 2 8 10 10 \
+-o sample_data/out_20201013 \
+-p sample_data/pic_20201014
+
 
 5. 
 python3 maf_analysis.py \
@@ -52,7 +55,7 @@ python3 maf_analysis.py \
 9.nimfa
 python3 maf_analysis.py \
 -f sample_data/out_20201013/maf_combination.maf \
--nf 2 8 10 5 \
+-nf 2 8 10 10 \
 -o sample_data/out_20201013 \
 -p sample_data/pic_20201014
 
