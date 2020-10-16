@@ -525,13 +525,18 @@ class OncoKBAnnotator:
     def data_analysis(self, folder, path, token, clinical):
         selected_df = (self.df[['Hugo_Symbol', 'Variant_Classification', 'Tumor_Sample_Barcode', 'HGVSp_Short', 'HGVSp']]).set_index("Hugo_Symbol")
         selected_df.to_csv(folder + "maf_5col_oncokb_input.txt", sep="\t")
-        os.system("python3 " + path + "MafAnnotator.py -i " + folder + "maf_5col_oncokb_input.txt -o " + folder + "maf_5col_oncokb_output.txt -b " + token + "\n")
-        os.system("python3 " + path + "ClinicalDataAnnotator.py -i "+clinical+" -o "+folder+"clinical_oncokb_output.txt -a "+folder+"maf_5col_oncokb_output.txt")
-        os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
+        os.system("git clone https://github.com/oncokb/oncokb-annotator.git\n")
+        os.chdir("oncokb-annotator")
+        os.system('pip3 install requests\n')
+        os.system("python3 MafAnnotator.py -i "+folder + "maf_5col_oncokb_input.txt -o " + folder + "maf_5col_oncokb_output.txt -b " + token + "\n")
+        os.system("python3 ClinicalDataAnnotator.py -i "+clinical+" -o "+folder+"clinical_oncokb_output.txt -a "+folder+"maf_5col_oncokb_output.txt\n")
+        os.chdir("..")
+        os.system("rm -rf oncokb-annotator\n")
+        # os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   "+folder+"maf_5col_oncokb_output.txt"), 'green'))
         print(colored(("   " + folder + "clinical_oncokb_output.txt"), 'green'))
-    def plotting(self, folder, level='4'):
+    def plotting(self, folder, pic, level='4'):
         self.file = folder + "clinical_oncokb_output.txt"
         df = pd.read_csv(self.file, sep="\t")
         df_level = df[['HIGHEST_LEVEL']]
@@ -559,7 +564,7 @@ class OncoKBAnnotator:
         size = [true_num, sample_size - true_num]
         labels = "Actionable\nbiomarkers","Current absence\nof new actionable\nbiomarkers"
         fig1, ax1 = plt.subplots()
-        ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#b7d5ea','#266199'] ,textprops={'fontsize': 11})
+        ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[0],COLOR_MAP[1]] ,textprops={'fontsize': 11})
         ax1.axis('equal')
         plt.title("Total", fontsize=18, fontweight='bold')
         plt.savefig(folder+"oncokb_total_pie.png", dpi=300, bbox_inches='tight')
@@ -578,19 +583,20 @@ class OncoKBAnnotator:
                             drug_total_dict[drug_name] = 1
                         else:
                             drug_total_dict[drug_name] += 1
-        langs = list(drug_total_dict.keys())
-        count = list(drug_total_dict.values())
+        langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
         fig2 = plt.figure(figsize=(8,5))
         ax2 = fig2.add_axes([0,0,1,1])
-        ax2.bar(langs, count, color='#266199')
+        ax2.bar(langs, count, color=COLOR_MAP[0])
         plt.xticks(fontsize=14)
         ax2.set_yticks(np.arange(0, max(count) + 1, 5))
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
         plt.yticks(fontsize=14)
         plt.ylabel("Count")
 
         plt.title("Frequency of Actionable Genes", fontsize=18, fontweight='bold')
         plt.savefig(folder+"oncokb_actionable_genes.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + folder + "oncokb_actionable_genes.png"), 'green'))
+        print(colored(("=> Generate Bar Plot: " + pic + "oncokb_actionable_genes.png"), 'green'))
 
 # 7. HRD score
 class HRDScore:

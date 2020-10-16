@@ -8,6 +8,7 @@ pip install seaborn
 pip install oncodriveclust
 pip install comut
 pip install SigProfilerPlotting
+pip install sklearn
 
 
 

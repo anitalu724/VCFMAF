@@ -79,14 +79,12 @@ def main():
     # 5. Mutation burden statistics
     if args.total_mutation_burden:
         df = TotalMutationBurden(args.file[0])
-        df.data_analysis(
-            folder, args.total_mutation_burden[0], int(args.total_mutation_burden[1])
-        )
+        df.data_analysis(folder, args.total_mutation_burden[0], int(args.total_mutation_burden[1]))
     # 6. OncoKB Annotator
     if args.oncokb_annotator:
         df = OncoKBAnnotator(args.file[0])
         df.data_analysis(folder,args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[3])
-        df.plotting(folder, args.oncokb_annotator[2])
+        df.plotting(folder,pic, args.oncokb_annotator[2])
     # 7. HRD score
     if args.hrd_score:
         df = HRDScore(args.hrd_score[0])
@@ -97,10 +95,6 @@ def main():
         df = WGDnCIN(args.wgd_cin[0])
         df.data_analysis(folder)
         df.plotting(folder)
-        
-
-
 
 if __name__ == "__main__":
     main()
-
