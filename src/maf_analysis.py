@@ -537,7 +537,7 @@ class OncoKBAnnotator:
         p.close()
         os.chdir("..")
         os.system("rm -rf oncokb-annotator\n")
-        # os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
+        os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   "+folder+"maf_5col_oncokb_output.txt"), 'green'))
         print(colored(("   " + folder + "clinical_oncokb_output.txt"), 'green'))
@@ -547,13 +547,11 @@ class OncoKBAnnotator:
         df_level = df[['HIGHEST_LEVEL']]
         level_list = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3A', 'LEVEL_3B', 'LEVEL_4']
         level_dict = dict.fromkeys(level_list,0)
-        
         sample_size = df.shape[0]
         for i in range(sample_size):
             if df_level.iloc[i]['HIGHEST_LEVEL'] in level_list:
                 level_dict[df_level.iloc[i]['HIGHEST_LEVEL']] += 1
         true_num = 0
-        
         if level == '4':
             true_num = sum(level_dict.values())
         elif level == '3':
@@ -565,15 +563,16 @@ class OncoKBAnnotator:
         elif level == '1':
             true_num = level_dict['LEVEL_1']
             level_list = ['LEVEL_1']
-
+        # Pie Plot( Total pie plot )
         size = [true_num, sample_size - true_num]
         labels = "Actionable\nbiomarkers","Current absence\nof new actionable\nbiomarkers"
         fig1, ax1 = plt.subplots()
         ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[0],COLOR_MAP[1]] ,textprops={'fontsize': 11})
         ax1.axis('equal')
         plt.title("Total", fontsize=18, fontweight='bold')
-        plt.savefig(folder+"oncokb_total_pie.png", dpi=300, bbox_inches='tight')
-        print(colored(("=> Generate Pie Plot: " + folder + "oncokb_total_pie.png"), 'green'))
+        plt.savefig(pic+"oncokb_total_pie.png", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + pic + "oncokb_total_pie.png"), 'green'))
+        # Bar Plot( Frequency of Actionable Genes )
         df_drug_count = df[level_list]
         drug_total_dict = {}
         for i in range(sample_size):
@@ -589,19 +588,19 @@ class OncoKBAnnotator:
                         else:
                             drug_total_dict[drug_name] += 1
         langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
+        freq = [i/sample_size for i in count]
         fig2 = plt.figure(figsize=(8,5))
         ax2 = fig2.add_axes([0,0,1,1])
-        ax2.bar(langs, count, color=COLOR_MAP[0])
-        plt.xticks(fontsize=14)
-        ax2.set_yticks(np.arange(0, max(count) + 1, 5))
+        ax2.bar(langs, freq, color=COLOR_MAP[0])
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        ax2.set_yticks(np.arange(0, 1, 0.2))
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
-        plt.yticks(fontsize=14)
-        plt.ylabel("Count")
-
-        plt.title("Frequency of Actionable Genes", fontsize=18, fontweight='bold')
-        plt.savefig(folder+"oncokb_actionable_genes.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + pic + "oncokb_actionable_genes.png"), 'green'))
+        plt.ylabel("Percentage", fontsize=18)
+        plt.title("Frequency of Actionable Genes", fontsize=20, fontweight='bold')
+        plt.savefig(pic+"oncokb_freq_actionable_genes.png", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + pic + "oncokb_freq_actionable_genes.png"), 'green'))
 
 # 7. HRD score
 class HRDScore:
@@ -631,7 +630,8 @@ class HRDScore:
         final_df.to_csv(folder + "all_HRDresults.csv",  index=False)
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   " + folder + "all_HRDresults.csv"), 'green'))
-    def plotting(self, folder):
+    def plotting(self, folder, pic):
+        #Bar Plot
         df = pd.read_csv(folder+"all_HRDresults.csv")
         size = df.shape[0]
         HRD = tuple(list(df['HRD']))
@@ -643,25 +643,30 @@ class HRDScore:
         width = 0.8
         fig = plt.figure(figsize=(12, 6))
         ax = fig.add_axes([0,0,1,1])
-        ax.bar(ind, HRD, width, color='#266199')
-        ax.bar(ind, TAI, width,bottom=HRD, color='#b7d5ea')
-        ax.bar(ind, LST, width,bottom=np.array(TAI)+np.array(HRD), color='#acc6aa')
-        ax.set_ylabel('Scores')
-        ax.set_title('HRD Scores',fontsize=18, fontweight='bold')
-        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light')
+        ax.bar(ind, HRD, width, color=COLOR_MAP[7])
+        ax.bar(ind, TAI, width,bottom=HRD, color=COLOR_MAP[2])
+        ax.bar(ind, LST, width,bottom=np.array(TAI)+np.array(HRD), color=COLOR_MAP[6])
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.set_ylabel('Scores', fontsize=18)
+        
+        ax.set_title('HRD Scores',fontsize=24, fontweight='bold')
+        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light', fontsize=12)
+        plt.yticks(fontsize=16)
         ax.set_yticks(np.arange(0, max(SUM)+3, 10))
-        ax.legend(labels=['HRD','Telomeric_AI','LST'])
-        plt.savefig(folder+"HRD_Score.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + folder + "HRD_Score.png"), 'green'))
+        ax.legend(labels=['HRD','Telomeric_AI','LST'], fontsize=14)
+        plt.savefig(pic+"HRD_Score.png", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + pic + "HRD_Score.png"), 'green'))
+        #Pie Plot
         over = len([i for i in SUM if i >=42])
         data = [over, size-over]
         labels='≧ 42','< 42'
         fig1, ax1 = plt.subplots()
-        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#266199','#b7d5ea'] ,textprops={'fontsize': 11})
+        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[7],COLOR_MAP[2]] ,textprops={'fontsize': 14})
         ax1.axis('equal')
-        plt.title("Propotion of Samples with HRD Phenotype", fontsize=18, fontweight='bold')
-        plt.savefig(folder+"high_HRD_pie.png", dpi=300, bbox_inches='tight')
-        print(colored(("=> Generate Pie Plot: " + folder + "high_HRD_pie.png"), 'green'))
+        plt.title("Propotion of Samples with HRD Phenotype", fontsize=20, fontweight='bold')
+        plt.savefig(pic+"high_HRD_pie.png", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + pic + "high_HRD_pie.png"), 'green'))
 
 #8. WGD and CIN
 class WGDnCIN:
@@ -695,7 +700,7 @@ class WGDnCIN:
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   " + folder + "WGD_result.csv"), 'green'))
         print(colored(("   " + folder + "CIN_result.csv"), 'green'))
-    def plotting(self, folder):
+    def plotting(self, folder, pic):
         # WGD Pie Plot
         wgd_df = pd.read_csv(folder+"WGD_result.csv")
         data = [0,0]
@@ -704,13 +709,13 @@ class WGDnCIN:
                 data[1]+=1
             elif wgd_df[['WGD']].iloc[i]['WGD'] == True:
                 data[0]+=1
-        labels = 'True','False'
+        labels = 'WGD','Non-WGD'
         fig1, ax1 = plt.subplots()
-        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=['#266199','#b7d5ea'] ,textprops={'fontsize': 11})
+        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[3],COLOR_MAP[4]] ,textprops={'fontsize': 14})
         ax1.axis('equal')
-        plt.title("Propotion of Samples with WGD", fontsize=18, fontweight='bold')
-        plt.savefig(folder+"WGD_pie.png", dpi=300, bbox_inches='tight')
-        print(colored(("=> Generate Pie Plot: " + folder + "WGD_pie.png"), 'green'))
+        plt.title("Propotion of Samples with WGD", fontsize=20, fontweight='bold')
+        plt.savefig(pic+"WGD_pie.png", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + pic + "WGD_pie.png"), 'green'))
         
         # CIN Bar plot
         CIN_df = pd.read_csv(folder+"CIN_result.csv")
@@ -722,11 +727,14 @@ class WGDnCIN:
         width = 0.8
         fig = plt.figure(figsize=(12, 6))
         ax = fig.add_axes([0,0,1,1])
-        ax.bar(ind, CIN, width, color='#266199')
-        ax.set_ylabel('Scores')
-        ax.set_title('CIN Scores',fontsize=18, fontweight='bold')
-        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light')
+        ax.bar(ind, CIN, width, color=COLOR_MAP[4])
+        ax.set_ylabel('Scores', fontsize=20)
+        ax.set_title('CIN Scores',fontsize=24, fontweight='bold')
+        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light', fontsize=12)
+        plt.yticks(fontsize=16)
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
         ax.set_yticks(np.arange(0, 1, 0.2))
-        plt.savefig(folder+"CIN_Score.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + folder + "CIN_Score.png"), 'green'))
+        plt.savefig(pic+"CIN_Score.png", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + pic + "CIN_Score.png"), 'green'))
 

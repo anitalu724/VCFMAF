@@ -89,12 +89,12 @@ def main():
     if args.hrd_score:
         df = HRDScore(args.hrd_score[0])
         df.data_analysis(folder, args.hrd_score[1])
-        df.plotting(folder)
+        df.plotting(folder, pic)
     #8. WGD and CIN
     if args.wgd_cin:
         df = WGDnCIN(args.wgd_cin[0])
         df.data_analysis(folder)
-        df.plotting(folder)
+        df.plotting(folder, pic)
 
 if __name__ == "__main__":
     main()

@@ -45,20 +45,17 @@ python3 maf_analysis.py \
 python3 maf_analysis.py \
 -f sample_data/example/CBCP_oncokb_maf.txt \
 -hrd sample_data/tsv/HRD_tsv/HRD_input.tsv grch37 \
--o sample_data/pic
+-o sample_data/out_20201013 \
+-p sample_data/pic_20201014
 
 8.
 python3 maf_analysis.py \
 -f sample_data/example/CBCP_oncokb_maf.txt \
 -wgdcin sample_data/tsv/HRD_tsv/HRD_input.tsv \
--o sample_data/20200930
-
-9.nimfa
-python3 maf_analysis.py \
--f sample_data/out_20201013/maf_combination.maf \
--nf 2 8 10 10 \
 -o sample_data/out_20201013 \
 -p sample_data/pic_20201014
+
+
 
 
 testing:
