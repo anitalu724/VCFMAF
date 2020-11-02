@@ -17,13 +17,13 @@ pip install SigProfilerPlotting
 ### Required input files
 * a TSV file
    * for VCF files: 9 columns					
-   | NORMAL | TUMOR | MuSe | Mutect2 | SomaticSniper | Strelka2 | VarScan2 | At Least # CALLS | At Most # REJECT |
-   | ------ | ----- | ---- | ------- | ------------- | -------- | -------- | ---------------- | ---------------- |
-   | ...    | ...   | ...  | ...     | ...           | ...      | ...      | ...              | ...              |
+| NORMAL | TUMOR | MuSe | Mutect2 | SomaticSniper | Strelka2 | VarScan2 | At Least # CALLS | At Most # REJECT |
+| ------ | ----- | ---- | ------- | ------------- | -------- | -------- | ---------------- | ---------------- |
+| ...    | ...   | ...  | ...     | ...           | ...      | ...      | ...              | ...              |
   * for MAF files: 1 column 
-   | MAF |
-   | --- |
-   | ... |
+| MAF |
+| --- |
+| ... |
 
 
 
