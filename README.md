@@ -14,19 +14,63 @@ pip install comut
 pip install SigProfilerPlotting
 ```
 ## Preprocessing VCF files and MAF files
-### Required input files
-* a TSV file
-   * for VCF files: 9 columns					
+```shell
+python3 vcf_maf_process.py ...
+```
+### Required input files(Required)
+```shell
+python3 vcf_maf_process.py \
+-f [tsv file path]
+```
+- for VCF files: a 9 columns TSV file
 
 | NORMAL | TUMOR | MuSe | Mutect2 | SomaticSniper | Strelka2 | VarScan2 | At Least # CALLS | At Most # REJECT |
 | ------ | ----- | ---- | ------- | ------------- | -------- | -------- | ---------------- | ---------------- |
 | ...    | ...   | ...  | ...     | ...           | ...      | ...      | ...              | ...              |
-  * for MAF files: 1 column 
+- for MAF files: a 1 column TSV file 
 
 | MAF |
 | --- |
 | ... |
 
+### For VCF preprocessing
+#### VCF filtering
+```shell
+python3 vcf_maf_process.py \
+...
+-vf GI "[1:3,5]" \
+...
+```
+#### VCF combination
+```shell
+python3 vcf_maf_process.py \
+...
+-c \
+...
+```
+#### VCF transform to MAF 
+```shell
+python3 vcf_maf_process.py \
+...
+-v2m 48 \
+...
+```
+### For MAF preprocessing
+#### MAF filtering
+```shell
+python3 vcf_maf_process.py \
+...
+-mf GI "[1:3,5]"
+...
+```
+### Output files and Meta files
+```shell
+python3 vcf_maf_process.py \
+...
+-o [output files path] \
+-m [meta files path] \
+...
+```
 
 
 
