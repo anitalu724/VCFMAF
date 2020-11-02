@@ -16,7 +16,7 @@ pip install SigProfilerPlotting
 ## Preprocessing VCF files and MAF files
 ### Required input files
 * a TSV file
-   * for VCF files: 9 columns						
+   * for VCF files: 9 columns					
    | NORMAL | TUMOR | MuSe | Mutect2 | SomaticSniper | Strelka2 | VarScan2 | At Least # CALLS | At Most # REJECT |
    | ------ | ----- | ---- | ------- | ------------- | -------- | -------- | ---------------- | ---------------- |
    | ...    | ...   | ...  | ...     | ...           | ...      | ...      | ...              | ...              |
