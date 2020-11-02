@@ -13,14 +13,21 @@ pip install oncodriveclust
 pip install comut
 pip install SigProfilerPlotting
 ```
-## Documentation
+## Preprocessing VCF files and MAF files
+### Required input files
+* a TSV file
+   * for VCF files: 9 columns
+   * 							
+| NORMAL | TUMOR | MuSe | Mutect2 | SomaticSniper | Strelka2 | VarScan2 | At Least # CALLS | At Most # REJECT |
+| ------ | ----- | ---- | ------- | ------------- | -------- | -------- | ---------------- | ---------------- |
+| ...    | ...   | ...  | ...     | ...           |
 
 
-## 代辦
-1. donut plot的顏色上限設定20
-2. OncoKB input 2 files(maf, clinical[SAMPLE ID, ONCOTREE CODE])
-   - 2張圓餅圖
-   - highest level畫圓餅圖
-   - ca398551-c549-49bd-80f0-0e68d9ca033c
-3. 
+
+
 # VCFMAF
+
+## Data Preprocessing
+
+####
+* My oncokb token: ca398551-c549-49bd-80f0-0e68d9ca033c
