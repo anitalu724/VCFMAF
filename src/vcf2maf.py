@@ -43,6 +43,7 @@ def vcf2vep2maf(vcf_file_list, maf_file_list, path, category, max_filter_ac):
             run_file.write("\n")
             run_file.write("printf \"${GREEN}\n=> Finish transforming file: "+vcf_file+" to "+maf_file_list[index]+"${NC}\n\n\"\n\n")
     else:
+        print(len(vcf_file_list),len(maf_file_list))
         print(colored("ERROR: Different number of VCF files and MAF files!\n", "red"))
     run_file.close()
     os.system("sh "+path+"/run.sh\n")
