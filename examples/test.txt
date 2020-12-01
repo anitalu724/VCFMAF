@@ -1,4 +1,12 @@
 1. Mutational Signature
+(0) Preprocessing
+python3 vcf_maf_process.py \
+-f examples/ms_vcf/vcf.tsv \
+-c \
+-v2m 48 \
+-m examples/ms_vcf \
+-o examples/ms_maf
+
 (1) Estimation
 python3 maf_analysis.py \
 -f examples/BRCA-TP.maf \
@@ -7,3 +15,15 @@ python3 maf_analysis.py \
 -p examples/pictures
 
 (2) Plotting
+
+
+
+['examples/ms_vcf/colon1-sample.vcf',
+'examples/ms_vcf/colon2-sample.vcf',
+'examples/ms_vcf/colon3-sample.vcf',
+'examples/ms_vcf/liver1-sample.vcf',
+'examples/ms_vcf/liver2-sample.vcf',
+'examples/ms_vcf/liver3-sample.vcf',
+'examples/ms_vcf/intestine1-sample.vcf',
+'examples/ms_vcf/intestine2-sample.vcf',
+'examples/ms_vcf/intestine3-sample.vcf']
