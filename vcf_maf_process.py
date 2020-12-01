@@ -72,8 +72,6 @@ def read_tsv(tsv_file):
         print(colored("\nThe input tsv file\'s content:\n", "green"))
         print(tabulate(category_print, headers=['NORMAL', 'TUMOR', '# of VCF files', 'At least # of variants', 'At most # of REJECT'], tablefmt='orgtbl'))
         flag = "vcf"
-        print("category: ", category)
-        os._exit()
         return flag, category, category_caller
     else:
         print(colored(ErrorPrint.TSV_format.value, 'red'))
