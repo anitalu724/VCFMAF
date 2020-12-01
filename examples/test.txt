@@ -1,0 +1,9 @@
+1. Mutational Signature
+(1) Estimation
+python3 maf_analysis.py \
+-f examples/BRCA-TP.maf \
+-ms 1 "[2,8,10]" \
+-o examples/outputs \
+-p examples/pictures
+
+(2) Plotting
