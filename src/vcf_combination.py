@@ -2,7 +2,7 @@
 # FileName     [ vcf_combination.py ]
 # PackageName  [ src ]
 # Synopsis     [ Combine 2 or more vcf files for a sample with different variants ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020. 7 ]
 ############################################################################################
 

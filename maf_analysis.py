@@ -2,13 +2,14 @@
 # FileName     [ maf_analysis.py ]
 # PackageName  [ VCFMAF ]
 # Synopsis     [ Control all functions ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020/8 ]
 ############################################################################################
 
 import numpy as np
 import pandas as pd
 import argparse, textwrap
+import ast
 from src.maf_analysis import (
     CoMutAnalysis,
     SigMutatedGeneDetection,
@@ -21,6 +22,8 @@ from src.maf_analysis import (
 )
 
 
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="MAF analysis", formatter_class=argparse.RawTextHelpFormatter
@@ -29,11 +32,17 @@ def main():
     parser.add_argument("-comut", "--comut_analysis", action="store_true")
     parser.add_argument("-smg", "--significantly_mutated_gene", action="store_true")
     parser.add_argument("-kcga", "--known_cancer_gene_annotaiton", action="store_true")
-    parser.add_argument("-ms", "--mutational_signature", nargs=4, help="Two items must be entered:\n\
-                                                         1. Rank start number\n\
-                                                         2. Rank end number\n\
-                                                         3. Epoch number\n\
-                                                         4. Signature Number\n")
+    parser.add_argument("-ms", "--mutational_signature", nargs=2, metavar=('step_#', 'list_of_params'),
+                        help=textwrap.dedent('''\
+                        Two steps are included: Estimation(0) and Plotting(1).
+                        For each step, two values are required:
+                        * Estimation
+                          1. 1
+                          2. [<Rank start number>, <Rank end number>, <Epoch number>]
+                        * Plotting
+                          1. 2
+                          2. [Signature Number]'''))
+                        
     parser.add_argument("-tmb","--total_mutation_burden",nargs=2,help="One item must be entered:\n \
                                                                        1. Sequencing Length\n",)
     parser.add_argument("-oncokb","--oncokb_annotator",nargs=4,help='Three items must be entered:\n \
@@ -73,8 +82,11 @@ def main():
     # 4. Mutational signature
     if args.mutational_signature:
         df = MutationalSignature(args.file[0])
-        df.data_analysis(folder, pic,args.mutational_signature[0], args.mutational_signature[1],args.mutational_signature[2],args.mutational_signature[3])
-        df.plotting(folder, pic)
+        params = ast.literal_eval(args.mutational_signature[1])
+        if args.mutational_signature[0] == '1':
+            df.data_analysis(folder, pic, params[0], params[1], params[2])
+        elif args.mutational_signature[0] == '2':
+            df.plotting(folder, pic, params[0])
         
     # 5. Mutation burden statistics
     if args.total_mutation_burden:

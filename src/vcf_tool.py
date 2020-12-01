@@ -2,7 +2,7 @@
 # FileName     [ vcf_tool.py ]
 # PackageName  [ src ]
 # Synopsis     [ Assisting vcf filters ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020 4 ]
 ############################################################################################
 

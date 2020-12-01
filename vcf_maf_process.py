@@ -2,7 +2,7 @@
 # FileName     [ vcf_maf.py ]
 # PackageName  [ My_Lab_Tool]
 # Synopsis     [ Control all functions ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020/7 ]
 ############################################################################################
 
@@ -233,7 +233,7 @@ def main():
                     FFPE = (category_caller[s_idx][vcf_idx] != "Mutect2")
                     if FFPE and new_filter_list[3]:
                         new_filter_list[3] = None
-                        print(colored(("Warning: FFPE filter does not apply to variant = "+ category_caller[s_idx][vcf_idx]), 'red'))
+                        print(colored(("Warning: FFPE filter does not apply to variant = "+ category_caller[s_idx][vcf_idx]), 'yellow'))
                         print("Skip the FFPE filter for " + sample[2][vcf_idx])
                 del_count, change = 0, False
                 output_path = meta+(sample[2][vcf_idx].split("/")[-1])[:-4]+"_formalized.vcf" if not args.vcf_filter else meta+(sample[2][vcf_idx].split("/")[-1])[:-4]+"_formalized_filter.vcf"

@@ -13,6 +13,8 @@ pip install oncodriveclust
 pip install comut
 pip install SigProfilerPlotting
 ```
+______
+
 ## Preprocessing VCF files and MAF files
 ```shell
 python3 vcf_maf_process.py ...
@@ -38,7 +40,7 @@ python3 vcf_maf_process.py \
 ```shell
 python3 vcf_maf_process.py \
 ...
--vf GI "[1:3,5]" \
+-vf GI "[1:3,5]" CI "15,15,0,0,0,0.05,8,8" P 1 FFPE 0.9 \
 ...
 ```
 #### VCF combination
@@ -71,12 +73,12 @@ python3 vcf_maf_process.py \
 -m [meta files path] \
 ...
 ```
+______
 
+## Data Analysis and Visualization
+### CoMut Plot Analysis
+###
 
-
-# VCFMAF
-
-## Data Preprocessing
-
+______
 ####
 * My oncokb token: ca398551-c549-49bd-80f0-0e68d9ca033c

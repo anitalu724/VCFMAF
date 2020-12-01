@@ -24,9 +24,19 @@ python3 maf_analysis.py \
 -p sample_data/pic_20201014
 
 4. Mutational Signature
+(1)Estimation
+
 python3 maf_analysis.py \
 -f sample_data/out_20201013/maf_combination.maf \
--ms 2 8 10 10 \
+-ms 1 "[2,8,10]" \
+-o sample_data/out_20201013 \
+-p sample_data/pic_20201014
+
+(2)Plotting
+
+python3 maf_analysis.py \
+-f sample_data/out_20201013/maf_combination.maf \
+-ms 2 "[4]" \
 -o sample_data/out_20201013 \
 -p sample_data/pic_20201014
 

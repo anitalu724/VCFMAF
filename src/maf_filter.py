@@ -2,7 +2,7 @@
 # FileName     [ maf_filter.py ]
 # PackageName  [ src ]
 # Synopsis     [ Sifting data from MAF files ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020 7]
 ############################################################################################
 

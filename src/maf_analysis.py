@@ -2,7 +2,7 @@
 # FileName     [ maf_analysis.py ]
 # PackageName  [ src ]
 # Synopsis     [ Use the entered MAF files to do some analysis ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020 9 ]
 ############################################################################################
 
@@ -250,7 +250,7 @@ class MutationalSignature:
     def __init__(self, file):
         print(colored(("\nStart Mutational_Signature...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder, pic, rank1, rank2, epoch, sig):
+    def data_analysis(self, folder, pic, rank1, rank2, epoch):
         def get_input_file():
             output_file = folder+"ms_input.tsv"
             selected_col = self.df[['Tumor_Sample_Barcode','flanking_bps', 'Reference_Allele', 'Tumor_Seq_Allele2']]
@@ -321,9 +321,9 @@ class MutationalSignature:
             code.write("import nimfa\nfrom collections import defaultdict, Counter\nimport urllib\nimport numpy as np\nfrom matplotlib import pyplot as plt\nimport matplotlib.gridspec as gridspec\nfrom sklearn import preprocessing\nimport scipy.cluster.hierarchy as sch\nimport pandas as pd\n")
             code.write("df = (pd.read_csv(\"../"+folder+"ms_input.tsv\", sep=\"\t\")).T\n")
             code.write("data = (df.to_numpy())[1:]\n")
-            code.write("rank_cands = range("+rank1+","+ rank2+", 1)\n")
+            code.write("rank_cands = range("+str(rank1)+","+ str(rank2)+", 1)\n")
             code.write("snmf = nimfa.Snmf(data, seed='random_vcol', max_iter=100)\n")
-            code.write("summary = snmf.estimate_rank(rank_range=rank_cands, n_run="+epoch+", what='all')\n")
+            code.write("summary = snmf.estimate_rank(rank_range=rank_cands, n_run="+str(epoch)+", what='all')\n")
             
             code.write("rss = [summary[rank]['rss'] for rank in rank_cands]\n")
             code.write("coph = [summary[rank]['cophenetic'] for rank in rank_cands]\n")
@@ -363,6 +363,11 @@ class MutationalSignature:
             print(colored(("   "+pic+"Estimation.png\n"), 'green'))
             os.chdir("..")
             os.system("rm -rf nimfa\n")
+        get_input_file()
+        estimation()
+        
+    def plotting(self, folder, pic, sig):
+        print(colored(("\nStart Mutational_Signature Plotting...."), 'yellow'))
         def nmf():
             print(colored(("\nStart NMF...."), 'yellow'))
             from sklearn.decomposition import NMF
@@ -383,11 +388,6 @@ class MutationalSignature:
             print(colored("=> Generate file: ", 'green'))
             print(colored(("   "+folder+"96_sig.csv"), 'green'))
             print(colored(("   "+folder+"sig_sample.csv"), 'green'))
-        get_input_file()
-        estimation()
-        nmf()
-    def plotting(self, folder, pic):
-        print(colored(("\nStart Mutational_Signature Plotting...."), 'yellow'))
         def SBSPlot():
             import sigProfilerPlotting as sigPlt
             df = pd.read_csv(folder+"96_sig.csv")
@@ -475,6 +475,7 @@ class MutationalSignature:
             p.gca().add_artist(my_circle)
             p.savefig(pic+"Donut_plot.png", dpi=300,bbox_inches='tight')
             print(colored(("=> Generate Donut Plot: "+pic+"Donut_plot.png"), 'green'))
+        nmf()
         SBSPlot()
         SigDistribution()
         CosineSimilarity()

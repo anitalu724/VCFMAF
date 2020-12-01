@@ -2,7 +2,7 @@
 # FileName     [ maf_plotting.py ]
 # PackageName  [ VCFMAF ]
 # Synopsis     [ Visualization of MAF analysis ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020/9 ]
 ############################################################################################
 

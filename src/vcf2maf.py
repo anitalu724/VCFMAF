@@ -2,7 +2,7 @@
 # FileName     [ vcf2maf.py ]
 # PackageName  [ src ]
 # Synopsis     [ Use vcf2maf module to convert VCF file to MAF ]
-# Author       [ Cheng-Hua (Anita) Lu ]
+# Author       [ LU, CHENG-HUA ]
 # Copyright    [ 2020.7 ]
 ############################################################################################
 
