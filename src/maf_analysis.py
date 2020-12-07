@@ -364,7 +364,7 @@ class MutationalSignature:
             os.chdir("..")
             os.system("rm -rf nimfa\n")
         get_input_file()
-        estimation()
+        # estimation()
         
     def plotting(self, folder, pic, sig):
         print(colored(("\nStart Mutational_Signature Plotting...."), 'yellow'))

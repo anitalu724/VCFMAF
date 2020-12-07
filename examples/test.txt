@@ -8,13 +8,13 @@ python3 vcf_maf_process_1.py \
 (1) Estimation
 python3 maf_analysis.py \
 -f examples/ms_maf/maf_combination.maf \
--ms 1 "[2,8,10]" \
+-ms 1 "[2,6,10]" \
 -o examples/outputs \
 -p examples/pictures
 
 (2) Plotting
 python3 maf_analysis.py \
--f sample_data/ms_maf/maf_combination.maf \
+-f examples/ms_maf/maf_combination.maf \
 -ms 2 "[2]" \
 -o examples/outputs \
 -p examples/pictures
