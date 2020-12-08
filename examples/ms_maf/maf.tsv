@@ -20,7 +20,6 @@ MAF
 ./examples/ms_maf/PD23549b5_PD23549b_Q100_PASS_20X_autosomal_noSNP_nonRECUR_final.maf
 ./examples/ms_maf/CLONESTE0097_BLOODSTE0097_Q100_PASS_20X_autosomal_noSNP_nonRECUR_final.maf
 ./examples/ms_maf/clone3_BIOPSY17513D_Q100_PASS_20X_autosomal_noSNP_nonRECUR_final.maf
-./examples/ms_maf/maf.tsv
 ./examples/ms_maf/STE007632_BOXTELBLOOD0076_Q100_PASS_20X_autosomal_noSNP_nonRECUR_final.maf
 ./examples/ms_maf/C211014D16CR_C211014DBIOPSY_Q100_PASS_20X_autosomal_noSNP_nonRECUR_final.maf
 ./examples/ms_maf/STE1207A_ste0120blood_Q100_PASS_20X_autosomal_noSNP_nonRECUR_final.maf
