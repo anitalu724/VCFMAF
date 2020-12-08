@@ -10,5 +10,5 @@ with open('./ms_maf/maf.tsv', 'wt') as out_file:
     tsv_writer = csv.writer(out_file, delimiter='\t')
     tsv_writer.writerow(['MAF'])
     for i in range(45):
-        tsv_writer.writerow([onlyfiles[i]])
+        tsv_writer.writerow(['./examples/ms_maf/'+onlyfiles[i]])
     
