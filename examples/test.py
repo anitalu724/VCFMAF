@@ -1,23 +1,14 @@
-vcf_list = ['examples/ms_vcf/colon1-sample.vcf',
-'examples/ms_vcf/colon2-sample.vcf',
-'examples/ms_vcf/colon3-sample.vcf',
-'examples/ms_vcf/liver1-sample.vcf',
-'examples/ms_vcf/liver2-sample.vcf',
-'examples/ms_vcf/liver3-sample.vcf',
-'examples/ms_vcf/intestine1-sample.vcf',
-'examples/ms_vcf/intestine2-sample.vcf',
-'examples/ms_vcf/intestine3-sample.vcf']
+from os import listdir
+from os.path import isfile, join
+my_path = './ms_maf'
+onlyfiles = [f for f in listdir(my_path) if isfile(join(my_path, f))]
+onlyfiles.remove('.DS_Store')
 
-maf_list = [
-'examples/ms_maf/colon1-sample.maf',
-'examples/ms_maf/colon2-sample.maf',
-'examples/ms_maf/colon3-sample.maf',
-'examples/ms_maf/liver1-sample.maf',
-'examples/ms_maf/liver2-sample.maf',
-'examples/ms_maf/liver3-sample.maf',
-'examples/ms_maf/intestine1-sample.maf',
-'examples/ms_maf/intestine2-sample.maf',
-'examples/ms_maf/intestine3-sample.maf']
+import csv
 
-vcf2vep2maf(vcf_list, maf_list, 'examples/ms_maf', )
-
+with open('./ms_maf/maf.tsv', 'wt') as out_file:
+    tsv_writer = csv.writer(out_file, delimiter='\t')
+    tsv_writer.writerow(['MAF'])
+    for i in range(45):
+        tsv_writer.writerow([onlyfiles[i]])
+    
