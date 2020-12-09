@@ -460,10 +460,11 @@ class MutationalSignature:
             height, length = len(my_list), len(aux_list)
             f, ax = plt.subplots(figsize=(20,6))
             ax = sns.heatmap(M, vmin=0, vmax=1, xticklabels =aux_list, yticklabels = my_list, square=True, 
-                                cmap="Blues",cbar_kws={"orientation": "vertical",'shrink':0.5})
+                                cmap="Blues",cbar_kws={"orientation": "horizontal",'shrink':1, 'aspect':50})
             ax.set_title('Cosine Similarity Plot',fontsize=18,weight='bold')
-            ax.set_xticklabels(ax.get_xticklabels(),rotation=45, horizontalalignment='right',fontweight='light', fontsize=7)
-            ax.set_yticklabels(ax.get_yticklabels(),fontweight='light', fontsize=7)
+            ax.set_xticklabels(ax.get_xticklabels(),rotation=90, horizontalalignment='center', fontsize=11, color='#222222')
+            ax.tick_params(axis='both',length=0)
+            ax.set_yticklabels(ax.get_yticklabels(), fontsize=11,color='#222222')
             plt.ylim(bottom=0, top=height+0.5)
             plt.savefig(pic+"S2S.png",dpi=300,bbox_inches='tight')
             plt.clf()
@@ -479,7 +480,7 @@ class MutationalSignature:
             for i in range(df.shape[0]):
                 d = tuple(df.iloc[i].tolist())
                 data.append(d)
-            fig = plt.figure(figsize=(12, 8))
+            fig = plt.figure(figsize=(10, 5))
             ax = fig.add_axes([0,0,1,1])
             for i in range(len(data)):
                 if i == 0:
@@ -489,10 +490,19 @@ class MutationalSignature:
                     for k in range(1,i):
                         b = b+np.array(data[k])
                     ax.bar(ind, data[i], 0.8, bottom=b,color = COLOR_MAP[i])
-            ax.set_title('Relative Contribution',fontsize=18, fontweight='bold')
-            plt.xticks(ind, sample_list,rotation=45,horizontalalignment='right',fontweight='light',fontsize=10)
+            ax.set_title('Relative Contribution',fontsize=24, fontweight='bold')
+            ax.spines['bottom'].set_color('#cac9c9')
+            ax.spines['top'].set_color('#FFFFFF') 
+            ax.spines['right'].set_color('#FFFFFF')
+            ax.spines['left'].set_color('#cac9c9')
+            ax.set_xlim([-1,len(ind)])
+            ax.tick_params(axis='y',direction='in', color='#cac9c9', labelsize=16)
+            ax.tick_params(axis='x',direction='in', length=0)
+            ax.xaxis.set_visible(False)
+
+            # plt.xticks(ind, sample_list,rotation=45,horizontalalignment='right',fontweight='light',fontsize=10)
             ax.set_yticks(np.arange(0, 1+0.1, 0.25))
-            ax.legend(title="Signature",labels=sig_list,loc='center right', bbox_to_anchor=(1.13, 0.5))
+            ax.legend(title="Signature",labels=sig_list,loc='center right', fontsize=12, edgecolor='white',title_fontsize=14, labelspacing=1, bbox_to_anchor=(1.17, 0.5))
             plt.savefig(pic+"SigContribution.png", dpi=300,bbox_inches='tight')
             print(colored(("=> Generate Bar Plot: " + pic+"SigContribution.png"), 'green')) 
             
@@ -500,10 +510,12 @@ class MutationalSignature:
             h_data = np.array(df.to_numpy())
             f,ax = plt.subplots(figsize=(12,6))
             ax = sns.heatmap(data, vmin=0, vmax=1, xticklabels =sample_list, yticklabels = sig_list, 
-                             square=True, cmap="Blues",
-                             cbar_kws={"orientation": "vertical",'shrink':0.5})
+                             square=True, cmap="Blues",cbar_kws={"orientation": "horizontal",'shrink':1, 'aspect':50})
             ax.set_title('Signature Sample Heatmap', fontsize=18,weight='bold')
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right',fontweight='light',fontsize=10)
+            ax.set_xticklabels(ax.get_xticklabels(),rotation=90, horizontalalignment='center', fontsize=11, color='#222222')
+            ax.tick_params(axis='both',length=0)
+            ax.set_yticklabels(ax.get_yticklabels(), fontsize=11,color='#222222')
+            # ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right',fontweight='light',fontsize=10)
             plt.savefig(pic+"SigSamHeatmap.png",dpi=300,bbox_inches='tight')
             print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.png"), 'green'))
         def DonutPlot():
@@ -521,11 +533,11 @@ class MutationalSignature:
             p.gca().add_artist(my_circle)
             p.savefig(pic+"Donut_plot.png", dpi=300,bbox_inches='tight')
             print(colored(("=> Generate Donut Plot: "+pic+"Donut_plot.png"), 'green'))
-        nmf()
-        SBSPlot()
+        # nmf()
+        # SBSPlot()
+        # CosineSimilarity()
         SigDistribution()
-        CosineSimilarity()
-        DonutPlot()
+        # DonutPlot()
 
 
 # 5. Mutation burden statistics
