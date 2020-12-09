@@ -9,13 +9,18 @@
 from .maf_filter import *
 import pandas as pd
 import numpy as np
+from numpy.lib.scimath import logn
+from math import e
 from termcolor import colored
 import time
 import os
 import math
 import seaborn as sns
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.style
+import matplotlib.ticker as mtick
+import matplotlib.ticker as ticker
 from matplotlib.ticker import MaxNLocator
 
 COLOR_MAP = ['#266199','#b7d5ea','#acc6aa','#E0CADB','#695D73','#B88655','#DDDDDD','#71a0a5','#841D22','#E08B69']
@@ -368,7 +373,7 @@ class MutationalSignature:
         estimation()
         
     def plotting(self, folder, pic, sig):
-        print(colored(("\nStart Mutational_Signature Plotting...."), 'yellow'))
+        print(colored(("\nStart Mutational_Signature Plotting(signature number must be in the range of 2 to 9)...."), 'yellow'))
         def nmf():
             print(colored(("\nStart NMF...."), 'yellow'))
             from sklearn.decomposition import NMF
@@ -380,25 +385,65 @@ class MutationalSignature:
             W = model.fit_transform(data)
             H = model.components_
             Hdf, Wdf = pd.DataFrame(H.T), pd.DataFrame(W.T)
-            Hdf.columns = ["Signature_"+str(i) for i in range(int(sig))]
+            Hdf.columns = ["Signature "+str(i+1) for i in range(int(sig))]
             Wdf.columns = sample_list
             Hdf.index = index_96
-            Wdf.index = ["Signature_"+str(i) for i in range(int(sig))]
+            Wdf.index = ["Signature "+str(i+1) for i in range(int(sig))]
             Hdf.to_csv(folder+"96_sig.csv")
             Wdf.to_csv(folder+"sig_sample.csv")
             print(colored("=> Generate file: ", 'green'))
             print(colored(("   "+folder+"96_sig.csv"), 'green'))
             print(colored(("   "+folder+"sig_sample.csv"), 'green'))
         def SBSPlot():
-            import sigProfilerPlotting as sigPlt
-            df = pd.read_csv(folder+"96_sig.csv")
-            col = list(df.columns)
-            col[0] = "MutationType"
-            df.columns = col
-            df.to_csv(folder+"SBS.tsv", "\t",index=False)
-            sigPlt.plotSBS(folder+"SBS.tsv", pic,"", "96", percentage=True)
-            print(colored(("=> Generate SBS Plot: "+pic+"SBS_96_plots_.pdf"), 'green'))
-            os.system("rm -rf "+folder+"SBS.tsv\n")
+            df = (pd.read_csv(folder+"96_sig.csv"))
+            df = df.set_index(list(df.columns[[0]]))
+            fig_x = tuple([ ' '+i[0]+' '+i[6] for i in list(df.index)])
+            y_pos = np.arange(len(fig_x))
+            fig_name = list(df.columns)
+            fig, axes = plt.subplots(df.shape[1], 1, figsize=(12,2*df.shape[1]))#
+            if df.shape[1] == 1:
+                return
+            for r in range(df.shape[1]):
+                color_set = ['#02bdee', '#010101','#e32925','#cac9c9', '#a1cf63', '#ecc7c4']
+                color_96 = [ c for c in color_set for i in range(16)]
+                all_data = df.iloc[:, r]
+                all_data /= (all_data.sum())
+                maximum = max(all_data)*1.25
+                data_list = all_data.tolist()
+                axes[r].text(0.01, 0.86, fig_name[r], horizontalalignment='left',verticalalignment='center', transform=axes[r].transAxes, fontweight='bold')
+                axes[r].bar(y_pos, data_list, color=color_96, width=0.4)
+                axes[r].spines['bottom'].set_color('#cac9c9')
+                axes[r].spines['top'].set_color('#cac9c9') 
+                axes[r].spines['right'].set_color('#cac9c9')
+                axes[r].spines['left'].set_color('#cac9c9')
+                if r != df.shape[1]-1:
+                    axes[r].xaxis.set_visible(False)
+                    axes[r].set_xticklabels([])
+                axes[r].tick_params(axis='x',length=0)
+                axes[r].set_xlim([-0.8,len(data_list)-.8])
+
+                axes[r].tick_params(axis='y',direction='in', color='#cac9c9', labelsize=10)
+                axes[r].set_ylabel('Percentage', fontweight='bold')
+                axes[r].tick_params(axis='y', labelsize=10)
+                axes[r].set_ylim(top = max(all_data)*1.25)
+                axes[r].yaxis.set_major_locator(ticker.LinearLocator(5))
+                axes[r].yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1, decimals=1))
+                for i in range(6):
+                    axes[r].add_patch(matplotlib.patches.Rectangle((0+16*i ,maximum*0.95), 15.6 , 0.01, color=color_set[i],transform=axes[r].transData))
+            mut_list = ['C>A','C>G','C>T','T>A','T>C','T>G']
+            for i in range(6):
+                plt.text(0.19+0.13*i,0.916-df.shape[1]*0.0029, mut_list[i], horizontalalignment='center',verticalalignment='center',transform=plt.gcf().transFigure, fontweight='bold', fontsize=14)
+            plt.xticks(y_pos, fig_x, color='#999999',rotation=90, fontsize=9,horizontalalignment='center',verticalalignment='top',fontname='monospace')#verticalalignment='bottom',
+            space = 0.008075
+            y_scale = [0.072, 0.084, 0.09, 0.094, 0.097, 0.0987, 0.1, 0.1013, 0.1023]
+            for i in range(6):
+                for j in range(16):
+                    if i < 3:
+                        plt.text((0.131+space*16*i)+space*j, y_scale[df.shape[1]-2], 'C',horizontalalignment='center',verticalalignment='center',transform=plt.gcf().transFigure, color=color_set[i], fontsize=9, rotation=90,fontname='monospace', fontweight='bold')
+                    else:
+                        plt.text((0.131+space*16*i)+space*j, y_scale[df.shape[1]-2], 'T',horizontalalignment='center',verticalalignment='center',transform=plt.gcf().transFigure, color=color_set[i], fontsize=9, rotation=90,fontname='monospace', fontweight='bold')
+            plt.savefig(pic+"SBS_96_plots.png",dpi=300, bbox_inches='tight')
+            print(colored(("=> Generate SBS Plot: "+pic+"SBS_96_plots.png"), 'green'))
         def CosineSimilarity():
             from sklearn.metrics.pairwise import cosine_similarity
             my_file, aux_file = folder+"96_sig.csv", "src/auxiliary_file/COSMIC_72.tsv"

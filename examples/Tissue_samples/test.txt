@@ -7,7 +7,7 @@ python3 vcf_maf_process.py \
 
 (1) Estimation
 python3 maf_analysis.py \
--f examples/Tissue_samples/ms_maf/maf_combination_old.maf \
+-f examples/Tissue_samples/ms_maf/maf_combination.maf \
 -ms 1 "[2,9,10]" \
 -o examples/Tissue_samples/outputs \
 -p examples/Tissue_samples/pictures
