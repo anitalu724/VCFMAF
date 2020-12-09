@@ -1,0 +1,106 @@
+1. Mutational Signature
+(0) Preprocessing
+python3 vcf_maf_process.py \
+-f examples/Mutational_pattern/ms_maf/maf.tsv \
+-m examples/Mutational_pattern/ms_maf \
+-o examples/Mutational_pattern/ms_maf
+
+(1) Estimation
+python3 maf_analysis.py \
+-f examples/Mutational_pattern/ms_maf/maf_combination.maf \
+-ms 1 "[2,6,10]" \
+-o examples/Mutational_pattern/outputs \
+-p examples/Mutational_pattern/pictures
+
+(2) Plotting
+python3 maf_analysis.py \
+-f examples/Mutational_pattern/ms_maf/maf_combination.maf \
+-ms 2 "[2]" \
+-o examples/Mutational_pattern/outputs \
+-p examples/Mutational_pattern/pictures
+
+
+
+
+
+
+
+
+
+
+
+
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/colon1-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/colon1-sample.maf \
+--tumor-id colon1_T \
+--normal-id colon1_N \
+--max-filter-ac 48
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/colon2-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/colon2-sample.maf \
+--tumor-id colon2_T \
+--normal-id colon2_N \
+--max-filter-ac 48
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/colon3-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/colon3-sample.maf \
+--tumor-id colon3_T \
+--normal-id colon3_N \
+--max-filter-ac 48
+
+====================
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/intestine1-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/intestine1-sample.maf \
+--tumor-id intestine1_T \
+--normal-id intestine1_N \
+--max-filter-ac 48
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/intestine2-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/intestine2-sample.maf \
+--tumor-id intestine2_T \
+--normal-id intestine2_N \
+--max-filter-ac 48
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/intestine3-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/intestine3-sample.maf \
+--tumor-id intestine3_T \
+--normal-id intestine3_N \
+--max-filter-ac 48
+
+
+===========
+
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/liver1-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/liver1-sample.maf \
+--tumor-id liver1_T \
+--normal-id liver1_N \
+--max-filter-ac 48
+
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/liver2-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/liver2-sample.maf \
+--tumor-id liver2_T \
+--normal-id liver2_N \
+--max-filter-ac 48
+
+
+perl vcf2maf.pl \
+--input-vcf VCFMAF/examples/ms_vcf/liver3-sample.vcf \
+--output-maf VCFMAF/examples/ms_maf/liver3-sample.maf \
+--tumor-id liver3_T \
+--normal-id liver3_N \
+--max-filter-ac 48
+
+
+

@@ -255,52 +255,48 @@ class MutationalSignature:
             output_file = folder+"ms_input.tsv"
             selected_col = self.df[['Tumor_Sample_Barcode','flanking_bps', 'Reference_Allele', 'Tumor_Seq_Allele2']]
             selected_col.columns = ['SampleID', 'Three_Allele', 'Ref', 'Mut']
-            new_dict = {}
-            for i in range(len(selected_col['SampleID'])):
-                if selected_col['SampleID'][i] not in new_dict:
-                    new_dict[selected_col['SampleID'][i]] = [selected_col.loc[i, :]]
-                else:
-                    new_dict[selected_col['SampleID'][i]].append(selected_col.loc[i, :])
-            # rearrange each data 
-            for sampleID in new_dict:
-                sample_dict = {'C>A':[],'C>G':[],'C>T':[],'T>A':[],'T>C':[],'T>G':[]}#,'OTHER':[]}
-                for item in new_dict[sampleID]:
+            sample_list = selected_col.SampleID.unique()
+            grouped = selected_col.groupby(selected_col['SampleID'])
+            df_list = [grouped.get_group(sample).reset_index(drop=True) for sample in sample_list]
+            final_dict = {}
+            for d, df in enumerate(df_list):
+                # order: 'C>A','C>G','C>T','T>A','T>C','T>G'
+                cata_list = [[],[],[],[],[],[]]
+                for i in range(len(df)):
+                    item = df.loc[i]
                     if (item['Ref'] == 'C' and item['Mut'] == 'A') or (item['Ref'] == 'G' and item['Mut'] == 'T'):
-                        sample_dict['C>A'].append(item)
+                        cata_list[0].append(item)
                     elif (item['Ref'] == 'C' and item['Mut'] == 'G') or (item['Ref'] == 'G' and item['Mut'] == 'C'):
-                        sample_dict['C>G'].append(item)
+                        cata_list[1].append(item)
                     elif (item['Ref'] == 'C' and item['Mut'] == 'T') or (item['Ref'] == 'G' and item['Mut'] == 'A'):
-                        sample_dict['C>T'].append(item)
+                        cata_list[2].append(item)
                     elif (item['Ref'] == 'T' and item['Mut'] == 'A') or (item['Ref'] == 'A' and item['Mut'] == 'T'):
-                        sample_dict['T>A'].append(item)
-                    elif (item['Ref'] == 'T' and item['Mut'] == 'C') or (item['Ref'] == 'A' and item['Mut'] == 'G'):
-                        sample_dict['T>C'].append(item)
+                        cata_list[3].append(item)
+                    elif (item['Ref'] == 'T' and item['Mut'] == 'C') or (item['Ref'] == 'A' and item['Mut'] == 'G'):                       
+                        cata_list[4].append(item)
                     elif (item['Ref'] == 'T' and item['Mut'] == 'G') or (item['Ref'] == 'A' and item['Mut'] == 'C'):
-                        sample_dict['T>G'].append(item)
+                        cata_list[5].append(item)
                 list_96 = []
-                for data in sample_dict:
-                    # data = ['C>A', 'C>G', 'C>T', 'T>A', 'T>C', 'T>G']
-                    if data != "OTHER":
-                        new_list = [int(0)]*16
-                        three_allele_dict = {}
-                        if data in ['C>A', 'C>G', 'C>T']:
-                            three_allele_dict={"ACA":0,     "TGT":0,    "ACC":1,    "TGG":1,    "ACG":2,    "TGC":2,    "ACT":3,    "TGA":3, \
-                                               "CCA":4,     "GGT":4,    "CCC":5,    "GGG":5,    "CCG":6,    "GGC":6,    "CCT":7,    "GGA":7, \
-                                               "GCA":8,     "CGT":8,    "GCC":9,    "CGG":9,    "GCG":10,   "CGC":10,   "GCT":11,   "CGA":11,\
-                                               "TCA":12,    "AGT":12,   "TCC":13,   "AGG":13,   "TCG":14,   "AGC":14,   "TCT":15,   "AGA":15 }   
-                        elif data in ['T>A', 'T>C', 'T>G']:
-                            three_allele_dict={"ATA":0,     "TAT":0,    "ATC":1,    "TAG":1,    "ATG":2,    "TAC":2,    "ATT":3,    "TAA":3, \
-                                               "CTA":4,     "GAT":4,    "CTC":5,    "GAG":5,    "CTG":6,    "GAC":6,    "CTT":7,    "GAA":7, \
-                                               "GTA":8,     "CAT":8,    "GTC":9,    "CAG":9,    "GTG":10,   "CAC":10,   "GTT":11,   "CAA":11,\
-                                               "TTA":12,    "AAT":12,   "TTC":13,   "AAG":13,   "TTG":14,   "AAC":14,   "TTT":15,   "AAA":15 }   
-                        for j in sample_dict[data]:
-                            # print(j['Three_Allele'])
-                            if j['Three_Allele'] in three_allele_dict:
-                                new_list[three_allele_dict[j['Three_Allele']]]+=1
-                        for each_num in new_list:
-                            list_96.append(each_num)
-                new_dict[sampleID] = list_96
-            new_df = pd.DataFrame.from_dict(new_dict)
+                for cata in range(len(cata_list)):
+                    cata_sum_list = [int(0)]*16
+                    if cata in [0,1,2]:
+                        three_allele_dict={"ACA":0,     "TGT":0,    "ACC":1,    "GGT":1,    "ACG":2,    "CGT":2,    "ACT":3,    "AGT":3, \
+                                           "CCA":4,     "TGG":4,    "CCC":5,    "GGG":5,    "CCG":6,    "CGG":6,    "CCT":7,    "AGG":7, \
+                                           "GCA":8,     "TGC":8,    "GCC":9,    "GGC":9,    "GCG":10,   "CGC":10,   "GCT":11,   "AGC":11,\
+                                           "TCA":12,    "TGA":12,   "TCC":13,   "GGA":13,   "TCG":14,   "CGA":14,   "TCT":15,   "AGA":15 }   
+                    elif cata in [3,4,5]:
+                        three_allele_dict={"ATA":0,     "TAT":0,    "ATC":1,    "GAT":1,    "ATG":2,    "CAT":2,    "ATT":3,    "AAT":3, \
+                                           "CTA":4,     "TAG":4,    "CTC":5,    "GAG":5,    "CTG":6,    "CAG":6,    "CTT":7,    "AAG":7, \
+                                           "GTA":8,     "TAC":8,    "GTC":9,    "GAC":9,    "GTG":10,   "CAC":10,   "GTT":11,   "AAC":11,\
+                                           "TTA":12,    "TAA":12,   "TTC":13,   "GAA":13,   "TTG":14,   "CAA":14,   "TTT":15,   "AAA":15 }  
+
+                    for j in range(len(cata_list[cata])):
+                        if (cata_list[cata][j])['Three_Allele'] in three_allele_dict:
+                            cata_sum_list[three_allele_dict[(cata_list[cata][j])['Three_Allele']]] += 1;
+                    list_96 += cata_sum_list
+                final_dict[sample_list[d]] = list_96
+
+            new_df = pd.DataFrame.from_dict(final_dict)
             list_a = ["A.A", "A.C", "A.G", "A.T", "C.A", "C.C", "C.G", "C.T",\
                       "G.A", "G.C", "G.G", "G.T", "T.A", "T.C", "T.G", "T.T"]
             list_b = ['C>A', 'C>G', 'C>T', 'T>A', 'T>C', 'T>G']
@@ -331,26 +327,31 @@ class MutationalSignature:
             code.write("spar = [summary[rank]['sparseness'] for rank in rank_cands]\n")
             code.write("spar_w, spar_h = zip(*spar)\n")
             code.write("evar = [summary[rank]['evar'] for rank in rank_cands]\n")
-            
             code.write("fig, axs = plt.subplots(2, 3, figsize=(12,8))\n")
-            code.write("axs[0,0].plot(rank_cands, rss, 'o-', color='#266199', label='RSS', linewidth=1.5)\n")
-            code.write("axs[0,0].set_title('RSS', fontsize=12,fontweight='bold')\n")
-            code.write("axs[0,0].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[0,1].plot(rank_cands, coph, 'o-', color='#695D73', label='Cophenetic correlation', linewidth=1.5)\n")
-            code.write("axs[0,1].set_title('Cophenetic', fontsize=12,fontweight='bold')\n")
-            code.write("axs[0,1].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[0,2].plot(rank_cands, disp,'o-', color='#71a0a5', label='Dispersion', linewidth=1.5)\n")
-            code.write("axs[0,2].set_title('Dispersion', fontsize=12,fontweight='bold')\n")
-            code.write("axs[0,2].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[1,0].plot(rank_cands, spar_w, 'o-', color='#B88655', label='Sparsity (Basis)', linewidth=1.5)\n")
-            code.write("axs[1,0].set_title('Sparsity (Basis)', fontsize=12,fontweight='bold')\n")
-            code.write("axs[1,0].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[1,1].plot(rank_cands, spar_h, 'o-', color='#E08B69', label='Sparsity (Mixture)', linewidth=1.5)\n")
-            code.write("axs[1,1].set_title('Sparsity (Mixture)', fontsize=12,fontweight='bold')\n")
-            code.write("axs[1,1].tick_params(axis='both', labelsize=8)\n")
-            code.write("axs[1,2].plot(rank_cands, evar,  'o-', color='#841D22', label='Explained variance', linewidth=1.5)\n")
-            code.write("axs[1,2].set_title('Explained variance', fontsize=12,fontweight='bold')\n")
-            code.write("axs[1,2].tick_params(axis='both', labelsize=8)\n")
+            code.write("axs[0,0].plot(rank_cands, rss, 'o-', color='#266199', label='RSS', linewidth=3)\n")
+            code.write("axs[0,0].set_title('RSS', fontsize=16,fontweight='bold')\n")
+            code.write("axs[0,0].tick_params(axis='both', labelsize=12)\n")
+            code.write("axs[0,0].set_xticks(np.arange("+str(rank1)+", "+str(rank2)+", 1))\n")
+            code.write("axs[0,1].plot(rank_cands, coph, 'o-', color='#695D73', label='Cophenetic correlation', linewidth=3)\n")
+            code.write("axs[0,1].set_title('Cophenetic', fontsize=16,fontweight='bold')\n")
+            code.write("axs[0,1].tick_params(axis='both', labelsize=12)\n")
+            code.write("axs[0,1].set_xticks(np.arange("+str(rank1)+", "+str(rank2)+", 1))\n")
+            code.write("axs[0,2].plot(rank_cands, disp,'o-', color='#71a0a5', label='Dispersion', linewidth=3)\n")
+            code.write("axs[0,2].set_title('Dispersion', fontsize=16,fontweight='bold')\n")
+            code.write("axs[0,2].tick_params(axis='both', labelsize=12)\n")
+            code.write("axs[0,2].set_xticks(np.arange("+str(rank1)+", "+str(rank2)+", 1))\n")
+            code.write("axs[1,0].plot(rank_cands, spar_w, 'o-', color='#B88655', label='Sparsity (Basis)', linewidth=3)\n")
+            code.write("axs[1,0].set_title('Sparsity (Basis)', fontsize=16,fontweight='bold')\n")
+            code.write("axs[1,0].tick_params(axis='both', labelsize=12)\n")
+            code.write("axs[1,0].set_xticks(np.arange("+str(rank1)+", "+str(rank2)+", 1))\n")
+            code.write("axs[1,1].plot(rank_cands, spar_h, 'o-', color='#E08B69', label='Sparsity (Mixture)', linewidth=3)\n")
+            code.write("axs[1,1].set_title('Sparsity (Mixture)', fontsize=16,fontweight='bold')\n")
+            code.write("axs[1,1].tick_params(axis='both', labelsize=12)\n")
+            code.write("axs[1,1].set_xticks(np.arange("+str(rank1)+", "+str(rank2)+", 1))\n")
+            code.write("axs[1,2].plot(rank_cands, evar,  'o-', color='#841D22', label='Explained variance', linewidth=3)\n")
+            code.write("axs[1,2].set_title('Explained variance', fontsize=16,fontweight='bold')\n")
+            code.write("axs[1,2].tick_params(axis='both', labelsize=12)\n")
+            code.write("axs[1,2].set_xticks(np.arange("+str(rank1)+", "+str(rank2)+", 1))\n")
             code.write("fig.tight_layout(pad=1.0)\n")
             code.write("plt.savefig(\"../"+pic+"Estimation.png\",dpi=300,bbox_inches = 'tight')\n")
             code.close()
@@ -398,6 +399,30 @@ class MutationalSignature:
             sigPlt.plotSBS(folder+"SBS.tsv", pic,"", "96", percentage=True)
             print(colored(("=> Generate SBS Plot: "+pic+"SBS_96_plots_.pdf"), 'green'))
             os.system("rm -rf "+folder+"SBS.tsv\n")
+        def CosineSimilarity():
+            from sklearn.metrics.pairwise import cosine_similarity
+            my_file, aux_file = folder+"96_sig.csv", "src/auxiliary_file/COSMIC_72.tsv"
+            my_df, aux_df = pd.read_csv(my_file, index_col=0), pd.read_csv(aux_file, sep="\t",index_col=0)
+            my_list, aux_list = my_df.columns, aux_df.columns
+            X = np.array(my_df.T.to_numpy())
+            Y = np.array(aux_df.T.to_numpy())
+            M = cosine_similarity(X, Y, dense_output=True)
+            Mdf= pd.DataFrame(M)
+            Mdf.index, Mdf.columns = my_list, aux_list
+            Mdf.to_csv(folder+"SBS.tsv", sep="\t")
+            print(colored("=> Generate file: ", 'green'))
+            print(colored(("   "+folder+"SBS.tsv"), 'green'))
+            height, length = len(my_list), len(aux_list)
+            f, ax = plt.subplots(figsize=(20,6))
+            ax = sns.heatmap(M, vmin=0, vmax=1, xticklabels =aux_list, yticklabels = my_list, square=True, 
+                                cmap="Blues",cbar_kws={"orientation": "vertical",'shrink':0.5})
+            ax.set_title('Cosine Similarity Plot',fontsize=18,weight='bold')
+            ax.set_xticklabels(ax.get_xticklabels(),rotation=45, horizontalalignment='right',fontweight='light', fontsize=7)
+            ax.set_yticklabels(ax.get_yticklabels(),fontweight='light', fontsize=7)
+            plt.ylim(bottom=0, top=height+0.5)
+            plt.savefig(pic+"S2S.png",dpi=300,bbox_inches='tight')
+            plt.clf()
+            print(colored(("=> Generate Cosine Similarity Plot: "+pic+"S2S.png"), 'green'))  
         def SigDistribution():
             df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
             sample_list = list(df.columns)
@@ -436,30 +461,6 @@ class MutationalSignature:
             ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right',fontweight='light',fontsize=10)
             plt.savefig(pic+"SigSamHeatmap.png",dpi=300,bbox_inches='tight')
             print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.png"), 'green'))
-        def CosineSimilarity():
-            from sklearn.metrics.pairwise import cosine_similarity
-            my_file, aux_file = folder+"96_sig.csv", "src/auxiliary_file/COSMIC_72.tsv"
-            my_df, aux_df = pd.read_csv(my_file, index_col=0), pd.read_csv(aux_file, sep="\t",index_col=0)
-            my_list, aux_list = my_df.columns, aux_df.columns
-            X = np.array(my_df.T.to_numpy())
-            Y = np.array(aux_df.T.to_numpy())
-            M = cosine_similarity(X, Y, dense_output=True)
-            Mdf= pd.DataFrame(M)
-            Mdf.index, Mdf.columns = my_list, aux_list
-            Mdf.to_csv(folder+"SBS.tsv", sep="\t")
-            print(colored("=> Generate file: ", 'green'))
-            print(colored(("   "+folder+"SBS.tsv"), 'green'))
-            height, length = len(my_list), len(aux_list)
-            f, ax = plt.subplots(figsize=(20,6))
-            ax = sns.heatmap(M, vmin=0, vmax=1, xticklabels =aux_list, yticklabels = my_list, square=True, 
-                                cmap="Blues",cbar_kws={"orientation": "vertical",'shrink':0.5})
-            ax.set_title('Cosine Similarity Plot',fontsize=18,weight='bold')
-            ax.set_xticklabels(ax.get_xticklabels(),rotation=45, horizontalalignment='right',fontweight='light', fontsize=7)
-            ax.set_yticklabels(ax.get_yticklabels(),fontweight='light', fontsize=7)
-            plt.ylim(bottom=0, top=height+0.5)
-            plt.savefig(pic+"S2S.png",dpi=300,bbox_inches='tight')
-            plt.clf()
-            print(colored(("=> Generate Cosine Similarity Plot: "+pic+"S2S.png"), 'green'))  
         def DonutPlot():
             import matplotlib.pyplot as pltd
             df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
