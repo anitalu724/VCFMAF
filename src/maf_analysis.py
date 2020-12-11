@@ -274,7 +274,7 @@ class MutationalSignature:
         S2S.pdf
         SigContribution.pdf
         SigSamHeatmap.pdf
-        Donut_plot.png
+        Donut_plot.pdf
 
     """
     def __init__(self, file):
@@ -546,7 +546,7 @@ class MutationalSignature:
             ax.tick_params(axis='both',length=0)
             ax.set_yticklabels(ax.get_yticklabels(), fontsize=LABEL_SIZE-4,color='#222222')
             plt.savefig(pic+"SigSamHeatmap.pdf",dpi=300,bbox_inches='tight')
-            print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.pdf"), 'green'))
+            print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.pdf\n"), 'green'))
         def DonutPlot():
             df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
             raw_data = df.sum(axis=1)/df.shape[1]
@@ -555,7 +555,7 @@ class MutationalSignature:
             names, sizes = list(raw_data.index), list(raw_data.iloc[:])
             names = [names[i]+": "+'{:.1%}'.format(sizes[i]) for i in range(len(sizes))]
             fig, ax = plt.subplots(figsize=(6, 8), subplot_kw=dict(aspect='equal'))
-            wedges, texts = ax.pie(sizes, colors=COLOR_MAP[:len(names)],wedgeprops=dict(width=0.6,edgecolor='w',linewidth=2), startangle=-40,normalize=False)
+            wedges, texts = ax.pie(sizes, colors=COLOR_MAP[:len(names)],wedgeprops=dict(width=0.6,edgecolor='w',linewidth=2), startangle=-40) #,normalize=False
 
             bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0)
             kw = dict(arrowprops=dict(arrowstyle="-"),bbox=bbox_props, zorder=0, va="center")
@@ -568,13 +568,14 @@ class MutationalSignature:
                 connectionstyle = "angle,angleA=0,angleB={}".format(ang)
                 kw["arrowprops"].update({"connectionstyle": connectionstyle})
                 ax.annotate(names[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),horizontalalignment=horizontalalignment, **kw, fontsize=LABEL_SIZE)
-            plt.savefig(pic+"Donut_plot.png", dpi=300, bbox_inches='tight')
-            print(colored(("=> Generate Donut Plot: "+pic+"Donut_plot.png"), 'green'))
+            plt.savefig(pic+"Donut_plot.pdf", dpi=300, bbox_inches='tight')
+            print(colored(("=> Generate Donut Plot: "+pic+"Donut_plot.pdf"), 'green'))
         nmf()
         SBSPlot()
+        DonutPlot()
         CosineSimilarity()
         SigDistribution()
-        DonutPlot()
+        
 
 
 # 5. Mutation burden statistics
