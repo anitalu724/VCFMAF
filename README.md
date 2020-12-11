@@ -1,8 +1,9 @@
+###### tags: `Lab`
 # MyLabTool
 MyLabTool is a Python tool for preprocessing variant call format(VCF) and mutation annotation format(MAF) files and 
 
 ## Prerequisite
-```shell
+```bash
 pip install termcolor
 pip install tqdm
 pip install numpy
@@ -16,11 +17,11 @@ pip install SigProfilerPlotting
 ______
 
 ## Preprocessing VCF files and MAF files
-```shell
+```bash
 python3 vcf_maf_process.py ...
 ```
 ### Required input files(Required)
-```shell
+```bash
 python3 vcf_maf_process.py \
 -f [tsv file path]
 ```
@@ -37,21 +38,21 @@ python3 vcf_maf_process.py \
 
 ### For VCF preprocessing
 #### VCF filtering
-```shell
+```bash
 python3 vcf_maf_process.py \
 ...
 -vf GI "[1:3,5]" CI "15,15,0,0,0,0.05,8,8" P 1 FFPE 0.9 \
 ...
 ```
 #### VCF combination
-```shell
+```bash
 python3 vcf_maf_process.py \
 ...
 -c \
 ...
 ```
 #### VCF transform to MAF 
-```shell
+```bash
 python3 vcf_maf_process.py \
 ...
 -v2m 48 \
@@ -59,14 +60,14 @@ python3 vcf_maf_process.py \
 ```
 ### For MAF preprocessing
 #### MAF filtering
-```shell
+```bash
 python3 vcf_maf_process.py \
 ...
 -mf GI "[1:3,5]"
 ...
 ```
 ### Output files and Meta files
-```shell
+```bash
 python3 vcf_maf_process.py \
 ...
 -o [output files path] \
@@ -79,14 +80,14 @@ ______
 ### CoMut Plot Analysis
 ### Mutational Signature
 1. Preprocessing: Make all MAFs into one MAF file
-```shell
+```bash
 python3 vcf_maf_process.py \
 -f examples/Tissue_samples/ms_maf/maf.tsv \
 -m examples/Tissue_samples/ms_maf \
 -o examples/Tissue_samples/ms_maf
 ```
 2. Estimation
-```shell
+```bash
 python3 maf_analysis.py \
 -f examples/Tissue_samples/ms_maf/maf_combination.maf \
 -ms 1 "[2,9,10]" \
@@ -94,13 +95,18 @@ python3 maf_analysis.py \
 -p examples/Tissue_samples/pictures
 ```
 3. Analysis and Visualization
-```shell
+```bash
 python3 maf_analysis.py \
 -f examples/Tissue_samples/ms_maf/maf_combination.maf \
 -ms 2 "[3]" \
 -o examples/Tissue_samples/outputs \
 -p examples/Tissue_samples/pictures
 ```
+4. Outputs
+![](https://i.imgur.com/mhWyWjf.png)
+
+
+
 ###
 
 ______
