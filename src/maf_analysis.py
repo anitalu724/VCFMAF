@@ -555,7 +555,7 @@ class MutationalSignature:
             names, sizes = list(raw_data.index), list(raw_data.iloc[:])
             names = [names[i]+": "+'{:.1%}'.format(sizes[i]) for i in range(len(sizes))]
             fig, ax = plt.subplots(figsize=(6, 8), subplot_kw=dict(aspect='equal'))
-            wedges, texts = ax.pie(sizes, colors=COLOR_MAP[:len(names)],wedgeprops=dict(width=0.6,edgecolor='w',linewidth=2), startangle=-40)
+            wedges, texts = ax.pie(sizes, colors=COLOR_MAP[:len(names)],wedgeprops=dict(width=0.6,edgecolor='w',linewidth=2), startangle=-40,normalize=False)
 
             bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0)
             kw = dict(arrowprops=dict(arrowstyle="-"),bbox=bbox_props, zorder=0, va="center")

@@ -8,7 +8,7 @@ pip install seaborn
 pip install oncodriveclust
 pip install comut
 pip install sklearn
-
+pip install fonttools
 
 
 
