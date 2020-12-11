@@ -77,6 +77,30 @@ ______
 
 ## Data Analysis and Visualization
 ### CoMut Plot Analysis
+### Mutational Signature
+1. Preprocessing: Make all MAFs into one MAF file
+```shell
+python3 vcf_maf_process.py \
+-f examples/Tissue_samples/ms_maf/maf.tsv \
+-m examples/Tissue_samples/ms_maf \
+-o examples/Tissue_samples/ms_maf
+```
+2. Estimation
+```shell
+python3 maf_analysis.py \
+-f examples/Tissue_samples/ms_maf/maf_combination.maf \
+-ms 1 "[2,9,10]" \
+-o examples/Tissue_samples/outputs \
+-p examples/Tissue_samples/pictures
+```
+3. Analysis and Visualization
+```shell
+python3 maf_analysis.py \
+-f examples/Tissue_samples/ms_maf/maf_combination.maf \
+-ms 2 "[3]" \
+-o examples/Tissue_samples/outputs \
+-p examples/Tissue_samples/pictures
+```
 ###
 
 ______
