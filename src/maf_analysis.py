@@ -252,6 +252,31 @@ class KnownCancerGeneAnnotation:
 
 # 4. Mutational signature
 class MutationalSignature:
+    """Mutational signature
+
+    Arguments:
+        file            {string}    -- A MAF file path
+        folder          {string}    -- The path for output files
+        pic             {string}    -- The path especially for output figures(.pdf)
+        rank1, rank2    {int}       -- The range for estimate # signature
+        epoch           {int}       -- # estimation running
+        sig             {int}       -- The final factorization rank(# signature)
+    
+    Outputs:
+        ms_input.tsv
+        96_sig.csv
+        sig_sample.csv
+        SBS.tsv
+        
+    Pictures:
+        Estimation.pdf
+        SBS_96_plots.pdf
+        S2S.pdf
+        SigContribution.pdf
+        SigSamHeatmap.pdf
+        Donut_plot.png
+
+    """
     def __init__(self, file):
         print(colored(("\nStart Mutational_Signature...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
@@ -358,7 +383,7 @@ class MutationalSignature:
             code.write("axs[1,2].tick_params(axis='both', labelsize=12)\n")
             code.write("axs[1,2].set_xticks(np.arange("+str(rank1)+", "+str(rank2)+", 1))\n")
             code.write("fig.tight_layout(pad=1.0)\n")
-            code.write("plt.savefig(\"../"+pic+"Estimation.png\",dpi=300,bbox_inches = 'tight')\n")
+            code.write("plt.savefig(\"../"+pic+"Estimation.pdf\",dpi=300,bbox_inches = 'tight')\n")
             code.close()
             print(colored(("\nStart Estimation(may need a few minutes)...."), 'yellow'))
             p = os.popen("python3 nimfa.py\n")
@@ -366,13 +391,14 @@ class MutationalSignature:
             print(x)
             p.close()
             print(colored("=> Generate estimation figure: ", 'green'))
-            print(colored(("   "+pic+"Estimation.png\n"), 'green'))
+            print(colored(("   "+pic+"Estimation.pdf\n"), 'green'))
             os.chdir("..")
             os.system("rm -rf nimfa\n")
         get_input_file()
         estimation()
         
     def plotting(self, folder, pic, sig):
+        LABEL_SIZE, TITLE_SIZE = 24,30
         print(colored(("\nStart Mutational_Signature Plotting(signature number must be in the range of 2 to 9)...."), 'yellow'))
         def nmf():
             print(colored(("\nStart NMF...."), 'yellow'))
@@ -442,8 +468,8 @@ class MutationalSignature:
                         plt.text((0.131+space*16*i)+space*j, y_scale[df.shape[1]-2], 'C',horizontalalignment='center',verticalalignment='center',transform=plt.gcf().transFigure, color=color_set[i], fontsize=9, rotation=90,fontname='monospace', fontweight='bold')
                     else:
                         plt.text((0.131+space*16*i)+space*j, y_scale[df.shape[1]-2], 'T',horizontalalignment='center',verticalalignment='center',transform=plt.gcf().transFigure, color=color_set[i], fontsize=9, rotation=90,fontname='monospace', fontweight='bold')
-            plt.savefig(pic+"SBS_96_plots.png",dpi=300, bbox_inches='tight')
-            print(colored(("=> Generate SBS Plot: "+pic+"SBS_96_plots.png"), 'green'))
+            plt.savefig(pic+"SBS_96_plots.pdf",dpi=300, bbox_inches='tight')
+            print(colored(("=> Generate SBS Plot: "+pic+"SBS_96_plots.pdf"), 'green'))
         def CosineSimilarity():
             from sklearn.metrics.pairwise import cosine_similarity
             my_file, aux_file = folder+"96_sig.csv", "src/auxiliary_file/COSMIC_72.tsv"
@@ -457,22 +483,25 @@ class MutationalSignature:
             Mdf.to_csv(folder+"SBS.tsv", sep="\t")
             print(colored("=> Generate file: ", 'green'))
             print(colored(("   "+folder+"SBS.tsv"), 'green'))
+            
             height, length = len(my_list), len(aux_list)
-            f, ax = plt.subplots(figsize=(20,6))
-            ax = sns.heatmap(M, vmin=0, vmax=1, xticklabels =aux_list, yticklabels = my_list, square=True, 
-                                cmap="Blues",cbar_kws={"orientation": "horizontal",'shrink':1, 'aspect':50})
-            ax.set_title('Cosine Similarity Plot',fontsize=18,weight='bold')
-            ax.set_xticklabels(ax.get_xticklabels(),rotation=90, horizontalalignment='center', fontsize=11, color='#222222')
+            sns.set(font_scale=2)
+            sns.set_style("white")
+            grid_kws = {"height_ratios": (.9, .2),"hspace": 0.3}  
+            f, (ax, cbar_ax) = plt.subplots(2,figsize=(20,6), gridspec_kw=grid_kws)
+            ax = sns.heatmap(M, vmin=0, vmax=1, xticklabels =aux_list, yticklabels = my_list, square=False, linewidth=1, cbar_ax=cbar_ax,ax=ax,
+                                cmap="Blues",cbar_kws={"orientation": "horizontal",'shrink':1, 'aspect':70})
+            # ax.set_title('Cosine Similarity',fontsize=TITLE_SIZE,weight='bold',pad=0,verticalalignment='bottom')
+            ax.set_xticklabels(ax.get_xticklabels(),rotation=90, horizontalalignment='center', fontsize=LABEL_SIZE-6, color='#222222')
             ax.tick_params(axis='both',length=0)
-            ax.set_yticklabels(ax.get_yticklabels(), fontsize=11,color='#222222')
+            ax.set_yticklabels(ax.get_yticklabels(), fontsize=LABEL_SIZE-6,color='#222222',verticalalignment='center')
             plt.ylim(bottom=0, top=height+0.5)
-            plt.savefig(pic+"S2S.png",dpi=300,bbox_inches='tight')
+            plt.savefig(pic+"S2S.pdf",dpi=300,bbox_inches='tight')
             plt.clf()
-            print(colored(("=> Generate Cosine Similarity Plot: "+pic+"S2S.png"), 'green'))  
+            print(colored(("=> Generate Cosine Similarity Plot: "+pic+"S2S.pdf"), 'green'))  
         def SigDistribution():
             df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
-            sample_list = list(df.columns)
-            sig_list = list(df.index)
+            sample_list, sig_list = list(df.columns),list(df.index)
             SUM = (df.sum(axis = 0, skipna = True)).tolist()
             df = df/SUM
             ind = np.arange(df.shape[1])
@@ -490,47 +519,56 @@ class MutationalSignature:
                     for k in range(1,i):
                         b = b+np.array(data[k])
                     ax.bar(ind, data[i], 0.8, bottom=b,color = COLOR_MAP[i])
-            ax.set_title('Relative Contribution',fontsize=24, fontweight='bold')
+            # ax.set_title('Relative Contribution',fontsize=TITLE_SIZE, fontweight='bold')
             ax.spines['bottom'].set_color('#cac9c9')
             ax.spines['top'].set_color('#FFFFFF') 
             ax.spines['right'].set_color('#FFFFFF')
             ax.spines['left'].set_color('#cac9c9')
             ax.set_xlim([-1,len(ind)])
-            ax.tick_params(axis='y',direction='in', color='#cac9c9', labelsize=16)
+            ax.tick_params(axis='y',direction='in', color='#cac9c9', labelsize=LABEL_SIZE-4)
             ax.tick_params(axis='x',direction='in', length=0)
             ax.xaxis.set_visible(False)
             ax.set_yticks(np.arange(0, 1+0.1, 0.25))
-            ax.legend(title="Signature",labels=sig_list,loc='center right', fontsize=12, edgecolor='white',title_fontsize=14, labelspacing=1, bbox_to_anchor=(1.17, 0.5))
-            plt.savefig(pic+"SigContribution.png", dpi=300,bbox_inches='tight')
-            print(colored(("=> Generate Bar Plot: " + pic+"SigContribution.png"), 'green')) 
+            ax.legend(title="",labels=sig_list,loc='lower center',ncol=3, fontsize=LABEL_SIZE-4, edgecolor='white',
+                      labelspacing=0.5, bbox_to_anchor=(0.5, (-0.1-(math.ceil(len(sig_list)/3)*0.065))))
+            plt.savefig(pic+"SigContribution.pdf", dpi=300,bbox_inches='tight')
+            print(colored(("=> Generate Bar Plot: " + pic+"SigContribution.pdf"), 'green')) 
             
             height, length = len(sig_list), len(sample_list)  
             h_data = np.array(df.to_numpy())
+            sns.set(font_scale=2)
             f,ax = plt.subplots(figsize=(9+length/20,2+height*0.3))
-            ax = sns.heatmap(data, vmin=0, vmax=1, yticklabels = sig_list, 
-                             square=True, cmap="Blues",cbar_kws={"orientation": "horizontal",'shrink':1, 'aspect':50})
-            ax.set_title('Signature Sample Heatmap', fontsize=24,weight='bold')
+            ax = sns.heatmap(data, vmin=0, vmax=1, yticklabels = sig_list, linewidths=1,
+                             square=False, cmap="Blues",cbar_kws={"orientation": "horizontal",'shrink':1, 'aspect':50})
+            # ax.set_title('Signature Sample Heatmap', fontsize=TITLE_SIZE,weight='bold',va='bottom')
             ax.xaxis.set_visible(False)
             ax.set_xticklabels([])
             ax.tick_params(axis='both',length=0)
-            ax.set_yticklabels(ax.get_yticklabels(), fontsize=12,color='#222222')
-            plt.savefig(pic+"SigSamHeatmap.png",dpi=300,bbox_inches='tight')
-            print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.png"), 'green'))
+            ax.set_yticklabels(ax.get_yticklabels(), fontsize=LABEL_SIZE-4,color='#222222')
+            plt.savefig(pic+"SigSamHeatmap.pdf",dpi=300,bbox_inches='tight')
+            print(colored(("=> Generate Heatmap: "+pic+"SigSamHeatmap.pdf"), 'green'))
         def DonutPlot():
-            import matplotlib.pyplot as pltd
             df = pd.read_csv(folder+"sig_sample.csv", index_col=0)
             raw_data = df.sum(axis=1)/df.shape[1]
             SUM = raw_data.sum(axis=0)
             raw_data = raw_data/SUM
             names, sizes = list(raw_data.index), list(raw_data.iloc[:])
-            fig, ax = plt.subplots(figsize=(4, 2), subplot_kw=dict(aspect="equal"))
-            wedges, texts, autotexts = ax.pie(sizes, colors=COLOR_MAP[:len(names)], autopct='%1.1f%%',textprops={'fontsize': 7},radius=1.2, pctdistance=1.3)
-            space = 0.021
-            leg = ax.legend(wedges, list(df.index),title_fontsize=8,fontsize=6,title='Signature',loc="center left",bbox_to_anchor=(1.05+space*(len(sizes)),0.5), edgecolor='white')
-            p = plt.gcf()
-            my_circle = plt.Circle( (0,0), 0.6, color='white')
-            p.gca().add_artist(my_circle)
-            p.savefig(pic+"Donut_plot.png", dpi=300, bbox_inches='tight')
+            names = [names[i]+": "+'{:.1%}'.format(sizes[i]) for i in range(len(sizes))]
+            fig, ax = plt.subplots(figsize=(6, 8), subplot_kw=dict(aspect='equal'))
+            wedges, texts = ax.pie(sizes, colors=COLOR_MAP[:len(names)],wedgeprops=dict(width=0.6,edgecolor='w',linewidth=2), startangle=-40)
+
+            bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0)
+            kw = dict(arrowprops=dict(arrowstyle="-"),bbox=bbox_props, zorder=0, va="center")
+
+            for i, p in enumerate(wedges):
+                ang = (p.theta2 - p.theta1)/2. + p.theta1
+                y = np.sin(np.deg2rad(ang))
+                x = np.cos(np.deg2rad(ang))
+                horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
+                connectionstyle = "angle,angleA=0,angleB={}".format(ang)
+                kw["arrowprops"].update({"connectionstyle": connectionstyle})
+                ax.annotate(names[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),horizontalalignment=horizontalalignment, **kw, fontsize=LABEL_SIZE)
+            plt.savefig(pic+"Donut_plot.png", dpi=300, bbox_inches='tight')
             print(colored(("=> Generate Donut Plot: "+pic+"Donut_plot.png"), 'green'))
         nmf()
         SBSPlot()
