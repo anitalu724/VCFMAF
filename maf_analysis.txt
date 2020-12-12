@@ -24,21 +24,25 @@ python3 maf_analysis.py \
 -p sample_data/pic_20201014
 
 4. Mutational Signature
-(1)Estimation
+(0) Preprocessing
+python3 vcf_maf_process.py \
+-f examples/Tissue_samples/ms_maf/maf.tsv \
+-m examples/Tissue_samples/ms_maf \
+-o examples/Tissue_samples/ms_maf
 
+(1) Estimation
 python3 maf_analysis.py \
--f sample_data/out_20201013/maf_combination.maf \
--ms 1 "[2,8,10]" \
--o sample_data/out_20201013 \
--p sample_data/pic_20201014
+-f examples/Tissue_samples/ms_maf/maf_combination.maf \
+-ms 1 "[2,9,10]" \
+-o examples/Tissue_samples/outputs \
+-p examples/Tissue_samples/pictures
 
-(2)Plotting
-
+(2) Plotting
 python3 maf_analysis.py \
--f sample_data/out_20201013/maf_combination.maf \
--ms 2 "[4]" \
--o sample_data/out_20201013 \
--p sample_data/pic_20201014
+-f examples/Tissue_samples/ms_maf/maf_combination.maf \
+-ms 2 "[3]" \
+-o examples/Tissue_samples/outputs \
+-p examples/Tissue_samples/pictures
 
 
 5. 
@@ -56,10 +60,10 @@ python3 maf_analysis.py \
 
 7.HRD_score
 python3 maf_analysis.py \
--f sample_data/example/CBCP_oncokb_maf.txt \
--hrd sample_data/tsv/HRD_tsv/HRD_input.tsv grch37 \
--o sample_data/out_20201013 \
--p sample_data/pic_20201014
+-f examples/CBCP_samples/CBCP_oncokb_maf.txt \
+-hrd examples/CBCP_samples/HRD_input.tsv grch37 \
+-o examples/CBCP_samples/outputs \
+-p examples/CBCP_samples/pictures
 
 8.WGD_CIN
 python3 maf_analysis.py \

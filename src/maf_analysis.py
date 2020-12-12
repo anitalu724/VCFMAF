@@ -701,6 +701,22 @@ class OncoKBAnnotator:
 
 # 7. HRD score
 class HRDScore:
+    """HRD score
+
+    Arguments:
+        file            {string}    -- A MAF file path
+        folder          {string}    -- The path for output files
+        ref             {string}    -- The reference genome used, grch38 or grch37 or mouse (default: grch38)
+        pic             {string}    -- The path especially for output figures(.pdf)
+
+    Outputs:
+        all_HRDresults.csv
+
+    Pictures:
+        HRD_Score.pdf
+        high_HRD_pie.pdf
+
+    """
     def __init__(self, file):
         print(colored(("\nStart analysing HRD Score...."), 'yellow'))
         self.list = ((pd.read_csv(file, sep="\t"))[['CNV_input']].values.T)[0]
@@ -728,6 +744,7 @@ class HRDScore:
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   " + folder + "all_HRDresults.csv"), 'green'))
     def plotting(self, folder, pic):
+        LABEL_SIZE, TITLE_SIZE = 24,30
         #Bar Plot
         df = pd.read_csv(folder+"all_HRDresults.csv")
         size = df.shape[0]
@@ -737,33 +754,39 @@ class HRDScore:
         SUM = list(df["HRD-sum"])
         Sample = tuple(list(df['Sample_id']))
         ind = np.arange(size)
-        width = 0.8
-        fig = plt.figure(figsize=(12, 6))
+        width = 0.7
+        fig = plt.figure(figsize=(10, 5))
         ax = fig.add_axes([0,0,1,1])
         ax.bar(ind, HRD, width, color=COLOR_MAP[7])
-        ax.bar(ind, TAI, width,bottom=HRD, color=COLOR_MAP[2])
-        ax.bar(ind, LST, width,bottom=np.array(TAI)+np.array(HRD), color=COLOR_MAP[6])
+        ax.bar(ind, TAI, width, bottom=HRD, color=COLOR_MAP[2])
+        ax.bar(ind, LST, width, bottom=np.array(TAI)+np.array(HRD), color=COLOR_MAP[6])
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
-        ax.set_ylabel('Scores', fontsize=18)
-        
-        ax.set_title('HRD Scores',fontsize=24, fontweight='bold')
-        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light', fontsize=12)
-        plt.yticks(fontsize=16)
-        ax.set_yticks(np.arange(0, max(SUM)+3, 10))
-        ax.legend(labels=['HRD','Telomeric_AI','LST'], fontsize=14)
-        plt.savefig(pic+"HRD_Score.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + pic + "HRD_Score.png"), 'green'))
+        ax.spines['bottom'].set_color('#cac9c9')
+        ax.spines['left'].set_color('#cac9c9')
+        ax.set_ylabel('Scores', fontsize=LABEL_SIZE, fontweight='bold')
+        ax.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
+        ax.tick_params(axis='y',direction='in', color='#cac9c9')
+        ax.set_ylim(top = max(SUM)*1.25)
+        # ax.set_title('HRD Scores',fontsize=TITLE_SIZE, fontweight='bold')
+        # plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light', fontsize=12)
+        ax.set_xlim([-1,len(ind)])
+        ax.xaxis.set_visible(False)
+        plt.yticks(fontsize=LABEL_SIZE-4)
+        ax.set_yticks(np.arange(0, max(SUM)*1.25+3, 10))
+        ax.legend(labels=['HRD','Telomeric_AI','LST'], fontsize=LABEL_SIZE-4, edgecolor='white')
+        plt.savefig(pic+"HRD_Score.pdf", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + pic + "HRD_Score.pdf"), 'green'))
         #Pie Plot
         over = len([i for i in SUM if i >=42])
         data = [over, size-over]
         labels='≧ 42','< 42'
         fig1, ax1 = plt.subplots()
-        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[7],COLOR_MAP[2]] ,textprops={'fontsize': 14})
+        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[7],COLOR_MAP[2]] ,textprops={'fontsize': LABEL_SIZE, 'size': LABEL_SIZE})
         ax1.axis('equal')
-        plt.title("Propotion of Samples with HRD Phenotype", fontsize=20, fontweight='bold')
-        plt.savefig(pic+"high_HRD_pie.png", dpi=300, bbox_inches='tight')
-        print(colored(("=> Generate Pie Plot: " + pic + "high_HRD_pie.png"), 'green'))
+        # plt.title("Propotion of Samples with HRD Phenotype", fontsize=TITLE_SIZE, fontweight='bold')
+        plt.savefig(pic+"high_HRD_pie.pdf", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + pic + "high_HRD_pie.pdf"), 'green'))
 
 #8. WGD and CIN
 class WGDnCIN:
