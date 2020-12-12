@@ -790,6 +790,22 @@ class HRDScore:
 
 #8. WGD and CIN
 class WGDnCIN:
+    """HRD score
+
+    Arguments:
+        file            {string}    -- A MAF file path
+        folder          {string}    -- The path for output files
+        pic             {string}    -- The path especially for output figures(.pdf)
+
+    Outputs:
+        WGD_result.csv
+        CIN_result.csv
+
+    Pictures:
+        CIN_Score.pdf
+        WGD_pie.pdf
+
+    """
     def __init__(self, file):
         print(colored(("\nStart analysing WGD and CIN...."), 'yellow'))
         self.list = ((pd.read_csv(file, sep="\t"))[['CNV_input']].values.T)[0]
@@ -833,8 +849,12 @@ class WGDnCIN:
                 data[0]+=1
         labels = 'WGD','Non-WGD'
         fig1, ax1 = plt.subplots()
-        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[3],COLOR_MAP[4]] ,textprops={'fontsize': LABEL_SIZE, 'size': LABEL_SIZE})
+        _, _, autotexts = ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[1],COLOR_MAP[0]] ,textprops={'fontsize': LABEL_SIZE, 'size': LABEL_SIZE})
         ax1.axis('equal')
+        print(autotexts)
+        autotexts[0].set_color('black')
+        autotexts[1].set_color('white')
+        # os._exit()
         # plt.title("Propotion of Samples with WGD", fontsize=20, fontweight='bold')
         plt.savefig(pic+"WGD_pie.pdf", dpi=300, bbox_inches='tight')
         print(colored(("=> Generate Pie Plot: " + pic + "WGD_pie.pdf"), 'green'))
@@ -846,10 +866,10 @@ class WGDnCIN:
         CIN = tuple(list(CIN_df['CIN']))
         Sample = tuple(list(CIN_df['SampleID']))
         ind = np.arange(size)
-        width = 0.8
-        fig = plt.figure(figsize=(12, 6))
+        width = 0.7
+        fig = plt.figure(figsize=(10, 5))
         ax = fig.add_axes([0,0,1,1])
-        ax.bar(ind, CIN, width, color=COLOR_MAP[4])
+        ax.bar(ind, CIN, width, color=COLOR_MAP[0])
         ax.set_ylabel('Scores', fontsize=LABEL_SIZE, fontweight='bold')
         # ax.set_title('CIN Scores',fontsize=24, fontweight='bold')
         # plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light', fontsize=12)
@@ -858,6 +878,7 @@ class WGDnCIN:
         ax.spines['top'].set_visible(False)
         ax.spines['bottom'].set_color('#cac9c9')
         ax.spines['left'].set_color('#cac9c9')
+        ax.set_xlim([-1,len(ind)])
         ax.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
         ax.tick_params(axis='y',direction='in', color='#cac9c9')
         ax.set_yticks(np.arange(0, 1, 0.2))
