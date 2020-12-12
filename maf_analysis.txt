@@ -67,10 +67,10 @@ python3 maf_analysis.py \
 
 8.WGD_CIN
 python3 maf_analysis.py \
--f sample_data/example/CBCP_oncokb_maf.txt \
--wgdcin sample_data/tsv/HRD_tsv/HRD_input.tsv \
--o sample_data/out_20201013 \
--p sample_data/pic_20201014
+-f examples/CBCP_samples/CBCP_oncokb_maf.txt \
+-wgdcin examples/CBCP_samples/HRD_input.tsv \
+-o examples/CBCP_samples/outputs \
+-p examples/CBCP_samples/pictures
 
 
 

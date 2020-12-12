@@ -799,10 +799,11 @@ class WGDnCIN:
                          135006516, 133851895, 115169878, 107349540, 102531392,
                          90354753, 81195210, 78077248, 59128983, 63025520, 48129895, 51304566]
         whole_length = sum(genome_length)
-        WGD_dict, CIN_dict = {}, {}
+        WGD_list, CIN_list, sample_list = [], [], []
         for sample in self.list:
             df = pd.read_csv(sample, sep="\t")
             sample_name = pd.unique(df['SampleID'])[0]
+            sample_list.append(sample_name)
             WGD_selected = df.loc[(df['A_cn'] >= 2)]
             CIN_selected = df.loc[(df['A_cn'] != 1) & (df['B_cn'] != 1)]
             WGD_SUM, CIN_SUM = 0, 0
@@ -810,10 +811,10 @@ class WGDnCIN:
                 WGD_SUM += WGD_selected.iloc[i]['End_position']-WGD_selected.iloc[i]['Start_position']
             for i in range(CIN_selected.shape[0]):
                 CIN_SUM += CIN_selected.iloc[i]['End_position']-CIN_selected.iloc[i]['Start_position']
-            WGD_dict[sample_name] = (WGD_SUM >= 0.5*whole_length)
-            CIN_dict[sample_name] = CIN_SUM/whole_length
-        WGD_df = pd.DataFrame.from_dict(WGD_dict, orient='index').reset_index()
-        CIN_df = pd.DataFrame.from_dict(CIN_dict, orient='index').reset_index()
+            WGD_list.append(WGD_SUM >= 0.5*whole_length)
+            CIN_list.append(CIN_SUM/whole_length)
+        WGD_df = (pd.DataFrame([sample_list, WGD_list])).T
+        CIN_df = (pd.DataFrame([sample_list, CIN_list])).T
         WGD_df.columns,CIN_df.columns = [['SampleID','WGD']], [['SampleID','CIN']]
         WGD_df.to_csv(folder + "WGD_result.csv",  index=False)
         CIN_df.to_csv(folder + "CIN_result.csv",  index=False)
@@ -822,6 +823,7 @@ class WGDnCIN:
         print(colored(("   " + folder + "CIN_result.csv"), 'green'))
     def plotting(self, folder, pic):
         # WGD Pie Plot
+        LABEL_SIZE, TITLE_SIZE = 24,30
         wgd_df = pd.read_csv(folder+"WGD_result.csv")
         data = [0,0]
         for i in range(wgd_df[['WGD']].shape[0]):
@@ -848,13 +850,18 @@ class WGDnCIN:
         fig = plt.figure(figsize=(12, 6))
         ax = fig.add_axes([0,0,1,1])
         ax.bar(ind, CIN, width, color=COLOR_MAP[4])
-        ax.set_ylabel('Scores', fontsize=20)
-        ax.set_title('CIN Scores',fontsize=24, fontweight='bold')
-        plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light', fontsize=12)
-        plt.yticks(fontsize=16)
+        ax.set_ylabel('Scores', fontsize=LABEL_SIZE, fontweight='bold')
+        # ax.set_title('CIN Scores',fontsize=24, fontweight='bold')
+        # plt.xticks(ind, Sample,rotation=45,horizontalalignment='right',fontweight='light', fontsize=12)
+        plt.yticks(fontsize=LABEL_SIZE-4)
         ax.spines['right'].set_visible(False)
         ax.spines['top'].set_visible(False)
+        ax.spines['bottom'].set_color('#cac9c9')
+        ax.spines['left'].set_color('#cac9c9')
+        ax.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
+        ax.tick_params(axis='y',direction='in', color='#cac9c9')
         ax.set_yticks(np.arange(0, 1, 0.2))
+        ax.xaxis.set_visible(False)
         plt.savefig(pic+"CIN_Score.png", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + pic + "CIN_Score.png"), 'green'))
 
