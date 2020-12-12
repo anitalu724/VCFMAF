@@ -833,11 +833,11 @@ class WGDnCIN:
                 data[0]+=1
         labels = 'WGD','Non-WGD'
         fig1, ax1 = plt.subplots()
-        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[3],COLOR_MAP[4]] ,textprops={'fontsize': 14})
+        ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[3],COLOR_MAP[4]] ,textprops={'fontsize': LABEL_SIZE, 'size': LABEL_SIZE})
         ax1.axis('equal')
-        plt.title("Propotion of Samples with WGD", fontsize=20, fontweight='bold')
-        plt.savefig(pic+"WGD_pie.png", dpi=300, bbox_inches='tight')
-        print(colored(("=> Generate Pie Plot: " + pic + "WGD_pie.png"), 'green'))
+        # plt.title("Propotion of Samples with WGD", fontsize=20, fontweight='bold')
+        plt.savefig(pic+"WGD_pie.pdf", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + pic + "WGD_pie.pdf"), 'green'))
         
         # CIN Bar plot
         CIN_df = pd.read_csv(folder+"CIN_result.csv")
@@ -862,6 +862,6 @@ class WGDnCIN:
         ax.tick_params(axis='y',direction='in', color='#cac9c9')
         ax.set_yticks(np.arange(0, 1, 0.2))
         ax.xaxis.set_visible(False)
-        plt.savefig(pic+"CIN_Score.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + pic + "CIN_Score.png"), 'green'))
+        plt.savefig(pic+"CIN_Score.pdf", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + pic + "CIN_Score.pdf"), 'green'))
 
