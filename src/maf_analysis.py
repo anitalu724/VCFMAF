@@ -25,80 +25,7 @@ from matplotlib.ticker import MaxNLocator
 
 COLOR_MAP = ['#266199','#b7d5ea','#acc6aa','#E0CADB','#695D73','#B88655','#DDDDDD','#71a0a5','#841D22','#E08B69']
 
-
-# 1. CoMut Plot Analysis
-class CoMutAnalysis:
-    """CoMut plot analysis
-
-    Arguments:
-        file {string} -- A MAF file path
-        folder {string} -- The path for every output file
-
-    Outputs:
-        mutation_data.tsv
-        mutation_burden.tsv
-    
-    """    
-    def __init__(self, file):
-        print(colored(("\nStart CoMut_Plot_Analysis...."), 'yellow'))
-        self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder):
-        def mutation_type():
-            maf = self.df
-            chosen_col = maf[['Tumor_Sample_Barcode','Hugo_Symbol','Variant_Classification']]
-            chosen_col = chosen_col.rename({'Tumor_Sample_Barcode':'sample', 'Hugo_Symbol':'category', 'Variant_Classification':'value'}, axis=1)
-            value_old_list = ['Missense_Mutation', 
-                              'Nonsense_Mutation',
-                              'In_Frame_Del', 
-                              'In_Frame_Ins',
-                              'Splice_Site',
-                              'Silent',
-                              'Frame_Shift_Del',
-                              'Frame_Shift_Ins',
-                              'Nonstop_Mutation',
-                              'Translation_Start_Site']
-            remove_idx = []
-            for i in range(len(chosen_col['value'])):
-                if chosen_col['value'][i] not in value_old_list:
-                    remove_idx.append(i)
-                else:
-                    if chosen_col['value'][i] == 'Missense_Mutation':
-                        chosen_col['value'][i] = 'Missense'
-                    elif chosen_col['value'][i] == 'Nonsense_Mutation':
-                        chosen_col['value'][i] = 'Nonsense'
-                    elif chosen_col['value'][i] == 'Nonstop_Mutation':
-                        chosen_col['value'][i] = 'Nonstop'
-                    elif chosen_col['value'][i] == 'In_Frame_Del' or chosen_col['value'][i] == 'In_Frame_Ins':
-                        chosen_col['value'][i] = 'In frame indel'
-                    elif chosen_col['value'][i] == 'Frame_Shift_Del' or chosen_col['value'][i] == 'Frame_Shift_Ins':
-                        chosen_col['value'][i] = 'Frameshift indel'
-                    elif chosen_col['value'][i] == 'Splice_Site':
-                        chosen_col['value'][i] = 'Splice site'
-                    elif chosen_col['value'][i] == 'Translation_Start_Site':
-                        chosen_col['value'][i] = 'Translation start site'
-            chosen_col = chosen_col.drop(chosen_col.index[remove_idx])
-            chosen_col.to_csv(folder+"mutation_data.tsv", sep = "\t", index = False)
-            print(colored(("=> Generate CoMut_Analysis output files:"), 'green'))
-            print(colored(("   "+folder+"mutation_data.tsv"), 'green'))
-        def mutation_clonality():
-            mutation_type_file = pd.read_csv(folder+"mutation_data.tsv", sep='\t', header=0)
-            sample_dict = dict()
-            for idx, data in mutation_type_file.iterrows():
-                if data['sample'] not in sample_dict:
-                    sample_dict[data['sample']] = [0, 0]
-                if data['value'] == "Silent":
-                    sample_dict[data['sample']][1]+=1
-                else:
-                    sample_dict[data['sample']][0]+=1
-
-            mutation_clone = pd.DataFrame.from_dict(sample_dict, orient='index')
-            mutation_clone.reset_index(level=0, inplace=True)
-            mutation_clone.to_csv(folder+"mutation_burden.tsv", sep='\t', header=['sample', 'Nonsynonymous', 'Synonymous'], index=False)
-            print(colored(("   "+folder+"mutation_burden.tsv"), 'green'))
-        mutation_type()
-        mutation_clonality() 
-
-# 2. Significantly mutated gene detection (Only oncodriveCLUST works until now)
+# 1. Significantly mutated gene detection (Only oncodriveCLUST works until now)
 class SigMutatedGeneDetection:
     """Significantly mutated gene detection (Only oncodriveCLUST works until now)
 
@@ -223,7 +150,7 @@ class SigMutatedGeneDetection:
         tEnd = time.time()
         print("dNdScv cost %f sec" % (tEnd - tStart))
 
-# 3. Known cancer gene annotation
+# 2. Known cancer gene annotation
 class KnownCancerGeneAnnotation:
     def __init__(self, file):
         print(colored(("\nStart Known_Cancer_Gene_Annotation...."), 'yellow'))
@@ -250,7 +177,114 @@ class KnownCancerGeneAnnotation:
         print(colored("=> Generate output file: ", 'green'))
         print(colored(("   "+output_file), 'green'))
 
-# 4. Mutational signature
+# 3. CoMut Plot Analysis
+class CoMutAnalysis:
+    """CoMut plot analysis
+
+    Arguments:
+        file {string} -- A MAF file path
+        folder {string} -- The path for every output file
+
+    Outputs:
+        mutation_data.tsv
+        mutation_burden.tsv
+    
+    """    
+    def __init__(self, file):
+        print(colored(("\nStart CoMut_Plot_Analysis...."), 'yellow'))
+        self.head, self.df = fast_read_maf(file)
+    def data_analysis(self, folder):
+        def mutation_type():
+            maf = self.df
+            chosen_col = maf[['Tumor_Sample_Barcode','Hugo_Symbol','Variant_Classification']]
+            chosen_col = chosen_col.rename({'Tumor_Sample_Barcode':'sample', 'Hugo_Symbol':'category', 'Variant_Classification':'value'}, axis=1)
+            value_old_list = ['Missense_Mutation', 
+                              'Nonsense_Mutation',
+                              'In_Frame_Del', 
+                              'In_Frame_Ins',
+                              'Splice_Site',
+                              'Silent',
+                              'Frame_Shift_Del',
+                              'Frame_Shift_Ins',
+                              'Nonstop_Mutation',
+                              'Translation_Start_Site']
+            remove_idx = []
+            for i in range(len(chosen_col['value'])):
+                if chosen_col['value'][i] not in value_old_list:
+                    remove_idx.append(i)
+                else:
+                    if chosen_col['value'][i] == 'Missense_Mutation':
+                        chosen_col['value'][i] = 'Missense'
+                    elif chosen_col['value'][i] == 'Nonsense_Mutation':
+                        chosen_col['value'][i] = 'Nonsense'
+                    elif chosen_col['value'][i] == 'Nonstop_Mutation':
+                        chosen_col['value'][i] = 'Nonstop'
+                    elif chosen_col['value'][i] == 'In_Frame_Del' or chosen_col['value'][i] == 'In_Frame_Ins':
+                        chosen_col['value'][i] = 'In frame indel'
+                    elif chosen_col['value'][i] == 'Frame_Shift_Del' or chosen_col['value'][i] == 'Frame_Shift_Ins':
+                        chosen_col['value'][i] = 'Frameshift indel'
+                    elif chosen_col['value'][i] == 'Splice_Site':
+                        chosen_col['value'][i] = 'Splice site'
+                    elif chosen_col['value'][i] == 'Translation_Start_Site':
+                        chosen_col['value'][i] = 'Translation start site'
+            chosen_col = chosen_col.drop(chosen_col.index[remove_idx])
+            chosen_col.to_csv(folder+"mutation_data.tsv", sep = "\t", index = False)
+            print(colored(("=> Generate CoMut_Analysis output files:"), 'green'))
+            print(colored(("   "+folder+"mutation_data.tsv"), 'green'))
+        def mutation_clonality():
+            mutation_type_file = pd.read_csv(folder+"mutation_data.tsv", sep='\t', header=0)
+            sample_dict = dict()
+            for idx, data in mutation_type_file.iterrows():
+                if data['sample'] not in sample_dict:
+                    sample_dict[data['sample']] = [0, 0]
+                if data['value'] == "Silent":
+                    sample_dict[data['sample']][1]+=1
+                else:
+                    sample_dict[data['sample']][0]+=1
+
+            mutation_clone = pd.DataFrame.from_dict(sample_dict, orient='index')
+            mutation_clone.reset_index(level=0, inplace=True)
+            mutation_clone.to_csv(folder+"mutation_burden.tsv", sep='\t', header=['sample', 'Nonsynonymous', 'Synonymous'], index=False)
+            print(colored(("   "+folder+"mutation_burden.tsv"), 'green'))
+        mutation_type()
+        mutation_clonality() 
+
+# 4. Mutation burden statistics
+class TotalMutationBurden:
+    def __init__(self, file):
+        print(colored(("\nStart Total Mutation Burden...."), 'yellow'))
+        self.head, self.df = fast_read_maf(file)
+    def data_analysis(self, folder, mode, length):
+        select_df = self.df[['Variant_Classification', 'Tumor_Sample_Barcode']]
+        non = ["Missense_Mutation","Splice_Site", "Translation_Start_Site","Nonstop_Mutation","Frame_Shift_Ins","Frame_Shift_Del","In_Frame_Del","In_Frame_Ins", "Nonsense_Mutation"]
+        sample = select_df['Tumor_Sample_Barcode'].unique()
+        sample_dict = {s:[0,0] for s in sample}     #list[all, nonsynonmous]
+        for i in range(select_df.shape[0]):
+            barcode, variant = select_df.iloc[i,:]['Tumor_Sample_Barcode'], select_df.iloc[i,:]['Variant_Classification']
+            sample_dict[barcode][0] += 1
+            if variant in non:
+                sample_dict[barcode][1] += 1
+            
+        for s in sample_dict:
+            sample_dict[s].append(sample_dict[s][0]*1000000/length)
+            sample_dict[s].append(sample_dict[s][1]*1000000/length)
+        d = pd.DataFrame(sample_dict).T.reset_index()
+        d.columns = ['sample', 'All', 'nonsynonmous', 'TMB_All', 'TMB_nonsynonmous']
+        stat_dict = {'mean' : [d['nonsynonmous'].sum()/len(sample), d['TMB_All'].sum()/len(sample), d['TMB_nonsynonmous'].sum()/len(sample)], 
+                     'median' : [d['nonsynonmous'].median(), d['TMB_All'].median(), d['TMB_nonsynonmous'].median()], 
+                     'max' : [d['nonsynonmous'].max(), d['TMB_All'].max(), d['TMB_nonsynonmous'].max()], 
+                     'min' : [d['nonsynonmous'].min(), d['TMB_All'].min(), d['TMB_nonsynonmous'].min()],
+                     'Q1' : [d['nonsynonmous'].quantile(q=0.25), d['TMB_All'].quantile(q=0.25), d['TMB_nonsynonmous'].quantile(q=0.25)],
+                     'Q3' : [d['nonsynonmous'].quantile(q=0.75), d['TMB_All'].quantile(q=0.75), d['TMB_nonsynonmous'].quantile(q=0.75)]}
+        stat_dict_df = pd.DataFrame(stat_dict).T
+        stat_dict_df.columns = ['nonsynonmous', 'TMB_All', 'TMB_nonsynonmous']
+        d.to_csv(folder+"TMB_analysis.tsv", sep="\t")
+        stat_dict_df.to_csv(folder+"TMB_statistic.tsv", sep="\t")
+        print(colored("=> Generate analysis files: ", 'green'))
+        print(colored(("   "+folder+"TMB_analysis.tsv"), 'green'))
+        print(colored(("   "+folder+"TMB_statistic.tsv"), 'green'))
+
+# 5. Mutational signature (V)
 class MutationalSignature:
     """Mutational signature
 
@@ -576,130 +610,7 @@ class MutationalSignature:
         CosineSimilarity()
         SigDistribution()
         
-
-
-# 5. Mutation burden statistics
-class TotalMutationBurden:
-    def __init__(self, file):
-        print(colored(("\nStart Total Mutation Burden...."), 'yellow'))
-        self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder, mode, length):
-        select_df = self.df[['Variant_Classification', 'Tumor_Sample_Barcode']]
-        non = ["Missense_Mutation","Splice_Site", "Translation_Start_Site","Nonstop_Mutation","Frame_Shift_Ins","Frame_Shift_Del","In_Frame_Del","In_Frame_Ins", "Nonsense_Mutation"]
-        sample = select_df['Tumor_Sample_Barcode'].unique()
-        sample_dict = {s:[0,0] for s in sample}     #list[all, nonsynonmous]
-        for i in range(select_df.shape[0]):
-            barcode, variant = select_df.iloc[i,:]['Tumor_Sample_Barcode'], select_df.iloc[i,:]['Variant_Classification']
-            sample_dict[barcode][0] += 1
-            if variant in non:
-                sample_dict[barcode][1] += 1
-            
-        for s in sample_dict:
-            sample_dict[s].append(sample_dict[s][0]*1000000/length)
-            sample_dict[s].append(sample_dict[s][1]*1000000/length)
-        d = pd.DataFrame(sample_dict).T.reset_index()
-        d.columns = ['sample', 'All', 'nonsynonmous', 'TMB_All', 'TMB_nonsynonmous']
-        stat_dict = {'mean' : [d['nonsynonmous'].sum()/len(sample), d['TMB_All'].sum()/len(sample), d['TMB_nonsynonmous'].sum()/len(sample)], 
-                     'median' : [d['nonsynonmous'].median(), d['TMB_All'].median(), d['TMB_nonsynonmous'].median()], 
-                     'max' : [d['nonsynonmous'].max(), d['TMB_All'].max(), d['TMB_nonsynonmous'].max()], 
-                     'min' : [d['nonsynonmous'].min(), d['TMB_All'].min(), d['TMB_nonsynonmous'].min()],
-                     'Q1' : [d['nonsynonmous'].quantile(q=0.25), d['TMB_All'].quantile(q=0.25), d['TMB_nonsynonmous'].quantile(q=0.25)],
-                     'Q3' : [d['nonsynonmous'].quantile(q=0.75), d['TMB_All'].quantile(q=0.75), d['TMB_nonsynonmous'].quantile(q=0.75)]}
-        stat_dict_df = pd.DataFrame(stat_dict).T
-        stat_dict_df.columns = ['nonsynonmous', 'TMB_All', 'TMB_nonsynonmous']
-        d.to_csv(folder+"TMB_analysis.tsv", sep="\t")
-        stat_dict_df.to_csv(folder+"TMB_statistic.tsv", sep="\t")
-        print(colored("=> Generate analysis files: ", 'green'))
-        print(colored(("   "+folder+"TMB_analysis.tsv"), 'green'))
-        print(colored(("   "+folder+"TMB_statistic.tsv"), 'green'))
-
-
-# 6. OncoKB annotator
-class OncoKBAnnotator:
-    def __init__(self, file):
-        print(colored(("\nStart OncoKB annotator(drug)...."), 'yellow'))
-        self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder, path, token, clinical):
-        selected_df = (self.df[['Hugo_Symbol', 'Variant_Classification', 'Tumor_Sample_Barcode', 'HGVSp_Short', 'HGVSp']]).set_index("Hugo_Symbol")
-        selected_df.to_csv(folder + "maf_5col_oncokb_input.txt", sep="\t")
-        os.system("git clone https://github.com/oncokb/oncokb-annotator.git\n")
-        os.chdir("oncokb-annotator")
-        os.system("pwd")
-        os.system('pip3 install requests\n')
-        p = os.popen("python3 MafAnnotator.py -i ../"+folder + "maf_5col_oncokb_input.txt -o ../" + folder + "maf_5col_oncokb_output.txt -b " + token + "\n")
-        print(p.read())
-        p.close()
-        p = os.popen("python3 ClinicalDataAnnotator.py -i ../"+clinical+" -o ../"+folder+"clinical_oncokb_output.txt -a ../"+folder+"maf_5col_oncokb_output.txt\n")
-        print(p.read())
-        p.close()
-        os.chdir("..")
-        os.system("rm -rf oncokb-annotator\n")
-        os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
-        print(colored("=> Generate analysis files: ", 'green'))
-        print(colored(("   "+folder+"maf_5col_oncokb_output.txt"), 'green'))
-        print(colored(("   " + folder + "clinical_oncokb_output.txt"), 'green'))
-    def plotting(self, folder, pic, level='4'):
-        self.file = folder + "clinical_oncokb_output.txt"
-        df = pd.read_csv(self.file, sep="\t")
-        df_level = df[['HIGHEST_LEVEL']]
-        level_list = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3A', 'LEVEL_3B', 'LEVEL_4']
-        level_dict = dict.fromkeys(level_list,0)
-        sample_size = df.shape[0]
-        for i in range(sample_size):
-            if df_level.iloc[i]['HIGHEST_LEVEL'] in level_list:
-                level_dict[df_level.iloc[i]['HIGHEST_LEVEL']] += 1
-        true_num = 0
-        if level == '4':
-            true_num = sum(level_dict.values())
-        elif level == '3':
-            true_num = sum(level_dict.values()) - level_dict['LEVEL_4']
-            level_list = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3A', 'LEVEL_3B']
-        elif level == '2':
-            true_num = level_dict['LEVEL_1'] + level_dict['LEVEL_2']
-            level_list = ['LEVEL_1', 'LEVEL_2']
-        elif level == '1':
-            true_num = level_dict['LEVEL_1']
-            level_list = ['LEVEL_1']
-        # Pie Plot( Total pie plot )
-        size = [true_num, sample_size - true_num]
-        labels = "Actionable\nbiomarkers","Current absence\nof new actionable\nbiomarkers"
-        fig1, ax1 = plt.subplots()
-        ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[0],COLOR_MAP[1]] ,textprops={'fontsize': 11})
-        ax1.axis('equal')
-        plt.title("Total", fontsize=18, fontweight='bold')
-        plt.savefig(pic+"oncokb_total_pie.png", dpi=300, bbox_inches='tight')
-        print(colored(("=> Generate Pie Plot: " + pic + "oncokb_total_pie.png"), 'green'))
-        # Bar Plot( Frequency of Actionable Genes )
-        df_drug_count = df[level_list]
-        drug_total_dict = {}
-        for i in range(sample_size):
-            for item in level_list:
-                data = df_drug_count.iloc[i][item]
-                if not pd.isna(data):
-                    new_drug_list = data.split("(")
-                    new_drug_list.pop(0)
-                    for drug in new_drug_list:
-                        drug_name = drug.split(" ")[0]
-                        if drug_name not in drug_total_dict:
-                            drug_total_dict[drug_name] = 1
-                        else:
-                            drug_total_dict[drug_name] += 1
-        langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
-        freq = [i/sample_size for i in count]
-        fig2 = plt.figure(figsize=(8,5))
-        ax2 = fig2.add_axes([0,0,1,1])
-        ax2.bar(langs, freq, color=COLOR_MAP[0])
-        plt.xticks(fontsize=16)
-        plt.yticks(fontsize=16)
-        ax2.set_yticks(np.arange(0, 1, 0.2))
-        ax2.spines['right'].set_visible(False)
-        ax2.spines['top'].set_visible(False)
-        plt.ylabel("Percentage", fontsize=18)
-        plt.title("Frequency of Actionable Genes", fontsize=20, fontweight='bold')
-        plt.savefig(pic+"oncokb_freq_actionable_genes.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + pic + "oncokb_freq_actionable_genes.png"), 'green'))
-
-# 7. HRD score
+# 6. HRD score (V)
 class HRDScore:
     """HRD score
 
@@ -788,7 +699,7 @@ class HRDScore:
         plt.savefig(pic+"high_HRD_pie.pdf", dpi=300, bbox_inches='tight')
         print(colored(("=> Generate Pie Plot: " + pic + "high_HRD_pie.pdf"), 'green'))
 
-#8. WGD and CIN
+# 7. WGD and CIN (V)
 class WGDnCIN:
     """HRD score
 
@@ -882,3 +793,87 @@ class WGDnCIN:
         plt.savefig(pic+"CIN_Score.pdf", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + pic + "CIN_Score.pdf"), 'green'))
 
+# 8. OncoKB annotator
+class OncoKBAnnotator:
+    def __init__(self, file):
+        print(colored(("\nStart OncoKB annotator(drug)...."), 'yellow'))
+        self.head, self.df = fast_read_maf(file)
+    def data_analysis(self, folder, path, token, clinical):
+        selected_df = (self.df[['Hugo_Symbol', 'Variant_Classification', 'Tumor_Sample_Barcode', 'HGVSp_Short', 'HGVSp']]).set_index("Hugo_Symbol")
+        selected_df.to_csv(folder + "maf_5col_oncokb_input.txt", sep="\t")
+        os.system("git clone https://github.com/oncokb/oncokb-annotator.git\n")
+        os.chdir("oncokb-annotator")
+        os.system("pwd")
+        os.system('pip3 install requests\n')
+        p = os.popen("python3 MafAnnotator.py -i ../"+folder + "maf_5col_oncokb_input.txt -o ../" + folder + "maf_5col_oncokb_output.txt -b " + token + "\n")
+        print(p.read())
+        p.close()
+        p = os.popen("python3 ClinicalDataAnnotator.py -i ../"+clinical+" -o ../"+folder+"clinical_oncokb_output.txt -a ../"+folder+"maf_5col_oncokb_output.txt\n")
+        print(p.read())
+        p.close()
+        os.chdir("..")
+        os.system("rm -rf oncokb-annotator\n")
+        os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
+        print(colored("=> Generate analysis files: ", 'green'))
+        print(colored(("   "+folder+"maf_5col_oncokb_output.txt"), 'green'))
+        print(colored(("   " + folder + "clinical_oncokb_output.txt"), 'green'))
+    def plotting(self, folder, pic, level='4'):
+        self.file = folder + "clinical_oncokb_output.txt"
+        df = pd.read_csv(self.file, sep="\t")
+        df_level = df[['HIGHEST_LEVEL']]
+        level_list = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3A', 'LEVEL_3B', 'LEVEL_4']
+        level_dict = dict.fromkeys(level_list,0)
+        sample_size = df.shape[0]
+        for i in range(sample_size):
+            if df_level.iloc[i]['HIGHEST_LEVEL'] in level_list:
+                level_dict[df_level.iloc[i]['HIGHEST_LEVEL']] += 1
+        true_num = 0
+        if level == '4':
+            true_num = sum(level_dict.values())
+        elif level == '3':
+            true_num = sum(level_dict.values()) - level_dict['LEVEL_4']
+            level_list = ['LEVEL_1', 'LEVEL_2', 'LEVEL_3A', 'LEVEL_3B']
+        elif level == '2':
+            true_num = level_dict['LEVEL_1'] + level_dict['LEVEL_2']
+            level_list = ['LEVEL_1', 'LEVEL_2']
+        elif level == '1':
+            true_num = level_dict['LEVEL_1']
+            level_list = ['LEVEL_1']
+        # Pie Plot( Total pie plot )
+        size = [true_num, sample_size - true_num]
+        labels = "Actionable\nbiomarkers","Current absence\nof new actionable\nbiomarkers"
+        fig1, ax1 = plt.subplots()
+        ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[0],COLOR_MAP[1]] ,textprops={'fontsize': 11})
+        ax1.axis('equal')
+        plt.title("Total", fontsize=18, fontweight='bold')
+        plt.savefig(pic+"oncokb_total_pie.png", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + pic + "oncokb_total_pie.png"), 'green'))
+        # Bar Plot( Frequency of Actionable Genes )
+        df_drug_count = df[level_list]
+        drug_total_dict = {}
+        for i in range(sample_size):
+            for item in level_list:
+                data = df_drug_count.iloc[i][item]
+                if not pd.isna(data):
+                    new_drug_list = data.split("(")
+                    new_drug_list.pop(0)
+                    for drug in new_drug_list:
+                        drug_name = drug.split(" ")[0]
+                        if drug_name not in drug_total_dict:
+                            drug_total_dict[drug_name] = 1
+                        else:
+                            drug_total_dict[drug_name] += 1
+        langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
+        freq = [i/sample_size for i in count]
+        fig2 = plt.figure(figsize=(8,5))
+        ax2 = fig2.add_axes([0,0,1,1])
+        ax2.bar(langs, freq, color=COLOR_MAP[0])
+        plt.xticks(fontsize=16)
+        plt.yticks(fontsize=16)
+        ax2.set_yticks(np.arange(0, 1, 0.2))
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+        plt.ylabel("Percentage", fontsize=18)
+        plt.title("Frequency of Actionable Genes", fontsize=20, fontweight='bold')
+        plt.savefig(pic+"oncokb_freq_actionable_genes.png", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + pic + "oncokb_freq_actionable_genes.png"), 'green'))

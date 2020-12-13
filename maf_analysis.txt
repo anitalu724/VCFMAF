@@ -23,7 +23,7 @@ python3 maf_analysis.py \
 -o sample_data/out_20201013 \
 -p sample_data/pic_20201014
 
-4. Mutational Signature
+5. Mutational Signature
 (0) Preprocessing
 python3 vcf_maf_process.py \
 -f examples/Tissue_samples/ms_maf/maf.tsv \
@@ -53,10 +53,10 @@ python3 maf_analysis.py \
 
 6. ONCOKB
 python3 maf_analysis.py \
--f sample_data/example/CBCP_oncokb_maf.txt \
+-f examples/CBCP_samples/CBCP_oncokb_maf.txt \
 -oncokb ../oncokb-annotator/ ca398551-c549-49bd-80f0-0e68d9ca033c 1 sample_data/example/CBCP_oncokb_clinical.txt \
--o sample_data/out_20201013 \
--p sample_data/pic_20201014
+-o examples/CBCP_samples/outputs \
+-p examples/CBCP_samples/pictures
 
 7.HRD_score
 python3 maf_analysis.py \
