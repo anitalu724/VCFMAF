@@ -3,7 +3,7 @@
 # PackageName  [ src ]
 # Synopsis     [ Use the entered MAF files to do some analysis ]
 # Author       [ LU, CHENG-HUA ]
-# Copyright    [ 2020 9 ]
+# Copyright    [ 2020 12 ]
 ############################################################################################
 
 from .maf_filter import *
@@ -849,9 +849,9 @@ class WGDnCIN:
                 data[0]+=1
         labels = 'WGD','Non-WGD'
         fig1, ax1 = plt.subplots()
-        _, _, autotexts = ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[1],COLOR_MAP[0]] ,textprops={'fontsize': LABEL_SIZE, 'size': LABEL_SIZE})
+        _, _, autotexts = ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[1],COLOR_MAP[0]] ,textprops={'fontsize': LABEL_SIZE}) #, 'size': LABEL_SIZE
         ax1.axis('equal')
-        print(autotexts)
+        # print(autotexts)
         autotexts[0].set_color('black')
         autotexts[1].set_color('white')
         # os._exit()
