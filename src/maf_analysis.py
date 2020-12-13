@@ -851,17 +851,13 @@ class WGDnCIN:
         fig1, ax1 = plt.subplots()
         _, _, autotexts = ax1.pie(data, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[1],COLOR_MAP[0]] ,textprops={'fontsize': LABEL_SIZE}) #, 'size': LABEL_SIZE
         ax1.axis('equal')
-        # print(autotexts)
         autotexts[0].set_color('black')
         autotexts[1].set_color('white')
-        # os._exit()
-        # plt.title("Propotion of Samples with WGD", fontsize=20, fontweight='bold')
         plt.savefig(pic+"WGD_pie.pdf", dpi=300, bbox_inches='tight')
         print(colored(("=> Generate Pie Plot: " + pic + "WGD_pie.pdf"), 'green'))
         
         # CIN Bar plot
         CIN_df = pd.read_csv(folder+"CIN_result.csv")
-
         size = CIN_df.shape[0]
         CIN = tuple(list(CIN_df['CIN']))
         Sample = tuple(list(CIN_df['SampleID']))
