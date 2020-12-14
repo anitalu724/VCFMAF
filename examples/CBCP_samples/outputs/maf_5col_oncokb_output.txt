@@ -2621,7 +2621,7 @@ NAV3	Missense_Mutation	CBCP00049-T1	p.S1224F	p.Ser1224Phe	False	False	Unknown
 TMTC3	Missense_Mutation	CBCP00049-T1	p.E804K	p.Glu804Lys	False	False	Unknown											
 RNF10	Missense_Mutation	CBCP00049-T1	p.Q693E	p.Gln693Glu	False	False	Unknown											
 LNX2	Missense_Mutation	CBCP00049-T1	p.R316Q	p.Arg316Gln	False	False	Unknown											
-BRCA2	Nonsense_Mutation	CBCP00049-T1	p.S3133*	p.Ser3133Ter	True	False	Likely Loss-of-function	Likely Oncogenic	Olaparib,Rucaparib,Niraparib	Talazoparib							LEVEL_1	24312913;11239455;22193408;20878484;10570174;25366685;30285518;30345884;24882434;Penson et al. Abstract# 5506, ASCO 2019(https://meetinglibrary.asco.org/record/173435/abstract);Abida et al. Abstract# 846PD, ESMO 2019(https://www.sciencedirect.com/science/article/pii/S0923753419590627);Abida et al. JCO, Aug 2020(https://ascopubs.org/doi/full/10.1200/JCO.20.01035);30948273;27717299;31562799;30110579;30563931
+BRCA2	Nonsense_Mutation	CBCP00049-T1	p.S3133*	p.Ser3133Ter	True	False	Likely Loss-of-function	Likely Oncogenic	Olaparib,Rucaparib,Niraparib	Talazoparib							LEVEL_1	24312913;11239455;22193408;20878484;10570174;26510020;32343890;28882436;28916367;32359490;30425037;30948273;27717299;31562799;30110579;30563931
 KL	Nonsense_Mutation	CBCP00049-T1	p.Q290*	p.Gln290Ter	False	False	Unknown											
 AKAP11	Missense_Mutation	CBCP00049-T1	p.S284L	p.Ser284Leu	False	False	Unknown											
 ERCC5	Missense_Mutation	CBCP00049-T1	p.E718Q	p.Glu718Gln	True	False	Unknown											
@@ -5436,7 +5436,7 @@ ZNF804A	Frame_Shift_Del	CBCP00020-T1	p.V1018*	p.Val1018Ter	False	False	Unknown
 DAB2	Frame_Shift_Ins	CBCP00020-T1	p.D741Efs*41	p.Asp741GlufsTer41	False	False	Unknown											
 SMAD1	Frame_Shift_Del	CBCP00021-T1	p.F216Sfs*19	p.Phe216SerfsTer19	False	False	Unknown											
 RARS	In_Frame_Del	CBCP00021-T1	p.K128_V132del	p.Lys128_Val132del	False	False	Unknown											
-ERBB2	In_Frame_Ins	CBCP00021-T1	p.G778_P780dup	p.Gly778_Pro780dup	True	True	Gain-of-function	Oncogenic		Ado-Trastuzumab Emtansine	Neratinib						LEVEL_2	23220880;29420467;31588020;29989854;30206164;17311002
+ERBB2	In_Frame_Ins	CBCP00021-T1	p.G778_P780dup	p.Gly778_Pro780dup	True	True	Gain-of-function	Oncogenic		Ado-Trastuzumab Emtansine	Neratinib						LEVEL_2	23220880;29420467;31588020;29989854;30206164
 MUC4	In_Frame_Ins	CBCP00022-T1	p.G3516_H3517insDTTTLPVTDTSSVSTGHATPLPVTSFSSVSTGDTTPLPVTDASSASTG	p.Gly3516_His3517insAspThrThrThrLeuProValThrAspThrSerSerValSerThrGlyHisAlaThrProLeuProValThrSerPheSerSerValSerThrGlyAspThrThrProLeuProValThrAspAlaSerSerAlaSerThrGly	False	False	Unknown											
 CELSR1	In_Frame_Del	CBCP00022-T1	p.A141_A149del	p.Ala141_Ala149del	False	False	Unknown											
 BCR	Frame_Shift_Ins	CBCP00023-T1	p.V1094Rfs*17	p.Val1094ArgfsTer17	True	False	Unknown											
@@ -5900,7 +5900,7 @@ SPRED1	Splice_Site	CBCP00112-T1	p.X229_splice		True	False	Likely Loss-of-functio
 STARD9	Frame_Shift_Del	CBCP00112-T1	p.Q740Kfs*33	p.Gln740LysfsTer33	False	False	Unknown											
 SLC12A4	In_Frame_Ins	CBCP00112-T1	p.A952_Q953insPSPFSYGTKAISCNCPQA	p.Ala952_Gln953insProSerProPheSerTyrGlyThrLysAlaIleSerCysAsnCysProGlnAla	False	False	Unknown											
 CBFA2T3	Frame_Shift_Ins	CBCP00112-T1	p.P599Hfs*165	p.Pro599HisfsTer165	False	False	Unknown											
-BRCA1	Splice_Site	CBCP00112-T1	p.X1516_splice		True	False	Likely Loss-of-function	Likely Oncogenic	Olaparib,Rucaparib,Niraparib	Talazoparib							LEVEL_1	11358863;20608970;12483515;12947386;25366685;30345884;24882434;Penson et al. Abstract# 5506, ASCO 2019(https://meetinglibrary.asco.org/record/173435/abstract);Abida et al. Abstract# 846PD, ESMO 2019(https://www.sciencedirect.com/science/article/pii/S0923753419590627);Abida et al. JCO, Aug 2020(https://ascopubs.org/doi/full/10.1200/JCO.20.01035);30948273;27717299;31562799;30110579;30563931;Dhawan, MS et al. JCO. Abstract# 2527(https://ascopubs.org/doi/abs/10.1200/JCO.2017.35.15_suppl.2527)
+BRCA1	Splice_Site	CBCP00112-T1	p.X1516_splice		True	False	Likely Loss-of-function	Likely Oncogenic	Olaparib,Rucaparib,Niraparib	Talazoparib							LEVEL_1	11358863;20608970;12483515;12947386;26510020;32343890;28882436;28916367;32359490;30425037;30948273;27717299;31562799;30110579;30563931;Dhawan, MS et al. JCO. Abstract# 2527(https://ascopubs.org/doi/abs/10.1200/JCO.2017.35.15_suppl.2527)
 GGN	In_Frame_Ins	CBCP00112-T1	p.P502_T503insAPYPAPAP	p.Pro502_Thr503insAlaProTyrProAlaProAlaPro	False	False	Unknown											
 NLRP11	Frame_Shift_Del	CBCP00112-T1	p.G497Sfs*11	p.Gly497SerfsTer11	False	False	Unknown											
 SLC52A3	In_Frame_Del	CBCP00112-T1	p.P220del	p.Pro220del	False	False	Unknown											
@@ -5923,7 +5923,7 @@ TRMT10B	Frame_Shift_Del	CBCP00113-T1	p.N225Qfs*11	p.Asn225GlnfsTer11	False	False
 CACNA1B	In_Frame_Ins	CBCP00113-T1	p.A950_K951insL	p.Ala950_Lys951insLeu	False	False	Unknown											
 GATA3	Splice_Site	CBCP00113-T1	p.X309_splice		True	False	Likely Loss-of-function	Likely Oncogenic										23426732;18242514;26637396;27588951;24758297
 HABP2	Frame_Shift_Del	CBCP00113-T1	p.K310Rfs*28	p.Lys310ArgfsTer28	False	False	Unknown											
-BRCA2	Frame_Shift_Del	CBCP00113-T1	p.H1932Qfs*12	p.His1932GlnfsTer12	True	False	Likely Loss-of-function	Likely Oncogenic	Olaparib,Rucaparib,Niraparib	Talazoparib							LEVEL_1	24312913;11239455;22193408;20878484;10570174;26510020;32343890;28882436;28916367;32359490;30425037;30948273;27717299;31562799;30110579;30563931
+BRCA2	Frame_Shift_Del	CBCP00113-T1	p.H1932Qfs*12	p.His1932GlnfsTer12	True	False	Likely Loss-of-function	Likely Oncogenic	Olaparib,Rucaparib,Niraparib	Talazoparib							LEVEL_1	24312913;11239455;22193408;20878484;10570174;25366685;30285518;30345884;24882434;Penson et al. Abstract# 5506, ASCO 2019(https://meetinglibrary.asco.org/record/173435/abstract);Abida et al. Abstract# 846PD, ESMO 2019(https://www.sciencedirect.com/science/article/pii/S0923753419590627);Abida et al. JCO, Aug 2020(https://ascopubs.org/doi/full/10.1200/JCO.20.01035);30948273;27717299;31562799;30110579;30563931
 THBS1	In_Frame_Del	CBCP00113-T1	p.N900_D906del	p.Asn900_Asp906del	False	False	Unknown											
 ABCA6	In_Frame_Del	CBCP00113-T1	p.A581del	p.Ala581del	False	False	Unknown											
 TSEN54	Frame_Shift_Del	CBCP00113-T1	p.A25Rfs*156	p.Ala25ArgfsTer156	False	False	Unknown											

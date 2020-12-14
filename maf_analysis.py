@@ -45,7 +45,7 @@ def main():
                         
     parser.add_argument("-tmb","--total_mutation_burden",nargs=2,help="One item must be entered:\n \
                                                                        1. Sequencing Length\n",)
-    parser.add_argument("-oncokb","--oncokb_annotator",nargs=4,help='Three items must be entered:\n \
+    parser.add_argument("-oncokb","--oncokb_annotator",nargs=5,help='Three items must be entered:\n \
                                                                      1. The relative path of the folder "oncokb-annotator".\n \
                                                                      2. The token of your OncoKB account.\n \
                                                                      3. The level of the drug. \n\
@@ -95,7 +95,7 @@ def main():
     # 6. OncoKB Annotator
     if args.oncokb_annotator:
         df = OncoKBAnnotator(args.file[0])
-        df.data_analysis(folder,args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[3])
+        df.data_analysis(folder,args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[3],args.oncokb_annotator[4])
         df.plotting(folder,pic, args.oncokb_annotator[2])
     # 7. HRD score
     if args.hrd_score:

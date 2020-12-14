@@ -798,8 +798,10 @@ class OncoKBAnnotator:
     def __init__(self, file):
         print(colored(("\nStart OncoKB annotator(drug)...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder, path, token, clinical):
+    def data_analysis(self, folder, path, token, clinical, cna):
         selected_df = (self.df[['Hugo_Symbol', 'Variant_Classification', 'Tumor_Sample_Barcode', 'HGVSp_Short', 'HGVSp']]).set_index("Hugo_Symbol")
+        a = selected_df['Tumor_Sample_Barcode'].unique()
+
         selected_df.to_csv(folder + "maf_5col_oncokb_input.txt", sep="\t")
         os.system("git clone https://github.com/oncokb/oncokb-annotator.git\n")
         os.chdir("oncokb-annotator")
@@ -811,13 +813,18 @@ class OncoKBAnnotator:
         p = os.popen("python3 ClinicalDataAnnotator.py -i ../"+clinical+" -o ../"+folder+"clinical_oncokb_output.txt -a ../"+folder+"maf_5col_oncokb_output.txt\n")
         print(p.read())
         p.close()
+        p = os.popen("python3 CnaAnnotator.py -i ../"+cna+" -o ../"+folder+"cna_oncokb_output.txt -c ../"+clinical+" -b "+ token + "\n")
+        print(p.read())
+        p.close()
         os.chdir("..")
-        os.system("rm -rf oncokb-annotator\n")
-        os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
+        # os.system("rm -rf oncokb-annotator\n")
+        # os.system("rm "+folder+"maf_5col_oncokb_input.txt\n")
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   "+folder+"maf_5col_oncokb_output.txt"), 'green'))
         print(colored(("   " + folder + "clinical_oncokb_output.txt"), 'green'))
+        print(colored(("   "+folder+"cna_oncokb_output.txt"), 'green'))
     def plotting(self, folder, pic, level='4'):
+        LABEL_SIZE, TITLE_SIZE = 24,30
         self.file = folder + "clinical_oncokb_output.txt"
         df = pd.read_csv(self.file, sep="\t")
         df_level = df[['HIGHEST_LEVEL']]
@@ -841,13 +848,14 @@ class OncoKBAnnotator:
             level_list = ['LEVEL_1']
         # Pie Plot( Total pie plot )
         size = [true_num, sample_size - true_num]
-        labels = "Actionable\nbiomarkers","Current absence\nof new actionable\nbiomarkers"
+        labels = "Actionable\nbiomarkers"," Current absence\n of new actionable\n biomarkers"
         fig1, ax1 = plt.subplots()
-        ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[0],COLOR_MAP[1]] ,textprops={'fontsize': 11})
+        _, _, autotexts = ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[3],COLOR_MAP[4]] ,textprops={'fontsize': LABEL_SIZE})
+        autotexts[1].set_color('white')
         ax1.axis('equal')
-        plt.title("Total", fontsize=18, fontweight='bold')
-        plt.savefig(pic+"oncokb_total_pie.png", dpi=300, bbox_inches='tight')
-        print(colored(("=> Generate Pie Plot: " + pic + "oncokb_total_pie.png"), 'green'))
+        # plt.title("Total", fontsize=18, fontweight='bold')
+        plt.savefig(pic+"oncokb_total_pie.pdf", dpi=300, bbox_inches='tight')
+        print(colored(("=> Generate Pie Plot: " + pic + "oncokb_total_pie.pdf"), 'green'))
         # Bar Plot( Frequency of Actionable Genes )
         df_drug_count = df[level_list]
         drug_total_dict = {}
@@ -864,16 +872,24 @@ class OncoKBAnnotator:
                         else:
                             drug_total_dict[drug_name] += 1
         langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
+        # print(langs)
         freq = [i/sample_size for i in count]
-        fig2 = plt.figure(figsize=(8,5))
+        fig2 = plt.figure(figsize=(10,5))
         ax2 = fig2.add_axes([0,0,1,1])
-        ax2.bar(langs, freq, color=COLOR_MAP[0])
-        plt.xticks(fontsize=16)
-        plt.yticks(fontsize=16)
+        width = 0.7
+        ax2.bar(langs, freq, width, color=COLOR_MAP[4])
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+        ax2.spines['bottom'].set_color('#cac9c9')
+        ax2.spines['left'].set_color('#cac9c9')
+        ax2.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
+        ax2.tick_params(axis='y',direction='in', color='#cac9c9')
+        plt.xticks(fontsize=LABEL_SIZE-4)
+        plt.yticks(fontsize=LABEL_SIZE-4)
         ax2.set_yticks(np.arange(0, 1, 0.2))
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
-        plt.ylabel("Percentage", fontsize=18)
-        plt.title("Frequency of Actionable Genes", fontsize=20, fontweight='bold')
-        plt.savefig(pic+"oncokb_freq_actionable_genes.png", dpi=300,bbox_inches='tight')
-        print(colored(("=> Generate Bar Plot: " + pic + "oncokb_freq_actionable_genes.png"), 'green'))
+        plt.ylabel("Percentage", fontsize=LABEL_SIZE, fontweight='bold')
+        # plt.title("Frequency of Actionable Genes", fontsize=20, fontweight='bold')
+        plt.savefig(pic+"oncokb_freq_actionable_genes.pdf", dpi=300,bbox_inches='tight')
+        print(colored(("=> Generate Bar Plot: " + pic + "oncokb_freq_actionable_genes.pdf"), 'green'))
