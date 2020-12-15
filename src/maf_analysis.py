@@ -39,6 +39,7 @@ class SigMutatedGeneDetection:
             oncodriveCLUST.syn.txt
         oncodriveCLUST output:
             oncodriveclust_results.tsv
+
     """    
     def __init__(self, file):
         print(colored(("\nStart Significantly_Mutated_Gene_Detection...."), 'yellow'))
@@ -152,6 +153,16 @@ class SigMutatedGeneDetection:
 
 # 2. Known cancer gene annotation
 class KnownCancerGeneAnnotation:
+    """Known cancer gene annotation
+
+    Arguments:
+        file {string} -- A MAF file path
+        folder {string} -- The path for every output file
+
+    Outputs:
+        kcga.output.maf
+            
+    """ 
     def __init__(self, file):
         print(colored(("\nStart Known_Cancer_Gene_Annotation...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
@@ -429,8 +440,7 @@ class MutationalSignature:
             os.chdir("..")
             os.system("rm -rf nimfa\n")
         get_input_file()
-        estimation()
-        
+        estimation()  
     def plotting(self, folder, pic, sig):
         LABEL_SIZE, TITLE_SIZE = 24,30
         print(colored(("\nStart Mutational_Signature Plotting(signature number must be in the range of 2 to 9)...."), 'yellow'))
@@ -793,7 +803,7 @@ class WGDnCIN:
         plt.savefig(pic+"CIN_Score.pdf", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + pic + "CIN_Score.pdf"), 'green'))
 
-# 8. OncoKB annotator
+# 8. OncoKB annotator (V)
 class OncoKBAnnotator:
     """OncoKB annotator
 
