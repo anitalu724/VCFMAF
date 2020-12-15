@@ -78,15 +78,16 @@ ______
 ## Data Analysis and Visualization
 ### CoMut Plot Analysis
 ### Mutational Signature
+
 1. Preprocessing: Make all MAFs into one MAF file
-```bash
+```bash=
 python3 vcf_maf_process.py \
 -f examples/Tissue_samples/ms_maf/maf.tsv \
 -m examples/Tissue_samples/ms_maf \
 -o examples/Tissue_samples/ms_maf
 ```
 2. Estimation
-```bash
+```bash=
 python3 maf_analysis.py \
 -f examples/Tissue_samples/ms_maf/maf_combination.maf \
 -ms 1 "[2,9,10]" \
@@ -94,7 +95,7 @@ python3 maf_analysis.py \
 -p examples/Tissue_samples/pictures
 ```
 3. Analysis and Visualization
-```bash
+```bash=
 python3 maf_analysis.py \
 -f examples/Tissue_samples/ms_maf/maf_combination.maf \
 -ms 2 "[3]" \
@@ -103,6 +104,40 @@ python3 maf_analysis.py \
 ```
 4. Outputs
 ![](https://i.imgur.com/mhWyWjf.png)
+
+
+### HRD Score, Whole-Genome doubling(WGD) and Chromosome instability(CIN)
+
+1. HRD Score
+```bash=
+python3 maf_analysis.py \
+-f examples/CBCP_samples/CBCP_oncokb_maf.txt \
+-hrd examples/CBCP_samples/HRD_input.tsv grch37 \
+-o examples/CBCP_samples/outputs \
+-p examples/CBCP_samples/pictures
+```
+
+2. WGD_CIN
+```bash=
+python3 maf_analysis.py \
+-f examples/CBCP_samples/CBCP_oncokb_maf.txt \
+-wgdcin examples/CBCP_samples/HRD_input.tsv \
+-o examples/CBCP_samples/outputs \
+-p examples/CBCP_samples/pictures
+```
+
+3. ONCOKB
+```bash=
+python3 maf_analysis.py \
+-f examples/TCGA/TCGA_Mutect_v10_white_rerun.maf \
+-oncokb ../oncokb-annotator/ ca398551-c549-49bd-80f0-0e68d9ca033c 4 examples/TCGA/clinical_input.txt \
+-o examples/TCGA/outputs \
+-p examples/TCGA/pictures
+```
+
+4. Outputs examples
+![](https://i.imgur.com/hSv3VsM.png)
+
 
 
 
