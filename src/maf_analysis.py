@@ -834,7 +834,7 @@ class OncoKBAnnotator:
         # print(p.read())
         # p.close()
         os.chdir("..")
-        # os.system("rm -rf oncokb-annotator\n")
+        os.system("rm -rf oncokb-annotator\n")
         # os.system("rm "+folder+"maf_oncokb_input.txt\n")
         print(colored("=> Generate analysis files: ", 'green'))
         print(colored(("   " + folder + "maf_oncokb_output.txt"), 'green'))
@@ -903,8 +903,8 @@ class OncoKBAnnotator:
         ax2.spines['left'].set_color('#cac9c9')
         ax2.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
         ax2.tick_params(axis='y',direction='in', color='#cac9c9')
-        plt.xticks(fontsize=LABEL_SIZE-4)
         plt.yticks(fontsize=LABEL_SIZE-4)
+        plt.xticks(y_pos, fig_x, color='#999999',rotation=90, fontsize=LABEL_SIZE-4,horizontalalignment='center',verticalalignment='top')#verticalalignment='bottom',
         ax2.set_yticks(np.arange(0, 1, 0.2))
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
