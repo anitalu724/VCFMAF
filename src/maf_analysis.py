@@ -892,6 +892,8 @@ class OncoKBAnnotator:
                             drug_total_dict[drug_name] += 1
         langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
         # print(langs)
+        print(count)
+        print(sample_size)
         freq = [i/sample_size for i in count]
         fig2 = plt.figure(figsize=(10,5))
         ax2 = fig2.add_axes([0,0,1,1])
@@ -904,7 +906,7 @@ class OncoKBAnnotator:
         ax2.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
         ax2.tick_params(axis='y',direction='in', color='#cac9c9')
         plt.yticks(fontsize=LABEL_SIZE-4)
-        plt.xticks(y_pos, fig_x, color='#999999',rotation=90, fontsize=LABEL_SIZE-4,horizontalalignment='center',verticalalignment='top')#verticalalignment='bottom',
+        plt.xticks(color='#999999',rotation=90, fontsize=LABEL_SIZE-4,horizontalalignment='center',verticalalignment='top')#verticalalignment='bottom',
         ax2.set_yticks(np.arange(0, 1, 0.2))
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
