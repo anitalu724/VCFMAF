@@ -43,7 +43,7 @@ def main():
                           1. 2
                           2. [Signature Number]'''))
                         
-    parser.add_argument("-tmb","--total_mutation_burden",nargs=2,help="One item must be entered:\n \
+    parser.add_argument("-tmb","--total_mutation_burden",nargs=1,help="One item must be entered:\n \
                                                                        1. Sequencing Length\n",)
     parser.add_argument("-oncokb","--oncokb_annotator",nargs='*',help='Three items must be entered:\n \
                                                                      1. The relative path of the folder "oncokb-annotator".\n \
@@ -67,10 +67,7 @@ def main():
     if pic[-1:] != "/":
         pic += "/"
 
-    # 1. CoMut Plot Analysis
-    if args.comut_analysis:
-        df = CoMutAnalysis(args.file[0])
-        df.data_analysis(folder)
+    
     # 2. Significantly mutated gene detection (Only oncodriveCLUST works until now)
     if args.significantly_mutated_gene:
         df = SigMutatedGeneDetection(args.file[0])
@@ -80,6 +77,15 @@ def main():
     if args.known_cancer_gene_annotaiton:
         df = KnownCancerGeneAnnotation(args.file[0])
         df.annotation(folder)
+       
+    # 5. Mutation burden statistics
+    if args.total_mutation_burden:
+        df = TotalMutationBurden(args.file[0])
+        df.data_analysis(folder, int(args.total_mutation_burden[0]))
+    # 1. CoMut Plot Analysis
+    if args.comut_analysis:
+        df = CoMutAnalysis(args.file[0])
+        df.data_analysis(folder)
     # 4. Mutational signature
     if args.mutational_signature:
         df = MutationalSignature(args.file[0])
@@ -88,11 +94,7 @@ def main():
             df.data_analysis(folder, pic, params[0], params[1], params[2])
         elif args.mutational_signature[0] == '2':
             df.plotting(folder, pic, params[0])
-        
-    # 5. Mutation burden statistics
-    if args.total_mutation_burden:
-        df = TotalMutationBurden(args.file[0])
-        df.data_analysis(folder, args.total_mutation_burden[0], int(args.total_mutation_burden[1]))
+     
     # 6. OncoKB Annotator
     if args.oncokb_annotator:
         df = OncoKBAnnotator(args.file[0])
