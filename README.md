@@ -3,7 +3,7 @@
 MyLabTool is a Python tool for preprocessing variant call format(VCF) and mutation annotation format(MAF) files and 
 
 ## Prerequisite
-```bash
+```bash=
 pip install termcolor
 pip install tqdm
 pip install numpy
@@ -16,11 +16,11 @@ pip install comut
 ______
 
 ## Preprocessing VCF files and MAF files
-```bash
+```bash=
 python3 vcf_maf_process.py ...
 ```
 ### Required input files(Required)
-```bash
+```bash=
 python3 vcf_maf_process.py \
 -f [tsv file path]
 ```
@@ -37,21 +37,21 @@ python3 vcf_maf_process.py \
 
 ### For VCF preprocessing
 #### VCF filtering
-```bash
+```bash=
 python3 vcf_maf_process.py \
 ...
 -vf GI "[1:3,5]" CI "15,15,0,0,0,0.05,8,8" P 1 FFPE 0.9 \
 ...
 ```
 #### VCF combination
-```bash
+```bash=
 python3 vcf_maf_process.py \
 ...
 -c \
 ...
 ```
 #### VCF transform to MAF 
-```bash
+```bash=
 python3 vcf_maf_process.py \
 ...
 -v2m 48 \
@@ -59,14 +59,14 @@ python3 vcf_maf_process.py \
 ```
 ### For MAF preprocessing
 #### MAF filtering
-```bash
+```bash=
 python3 vcf_maf_process.py \
 ...
 -mf GI "[1:3,5]"
 ...
 ```
 ### Output files and Meta files
-```bash
+```bash=
 python3 vcf_maf_process.py \
 ...
 -o [output files path] \
