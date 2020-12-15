@@ -863,6 +863,7 @@ class OncoKBAnnotator:
         elif level == '1':
             true_num = level_dict['LEVEL_1']
             level_list = ['LEVEL_1']
+        print(true_num)
         
         # os._exit()
         # Pie Plot( Total pie plot )
