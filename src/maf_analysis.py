@@ -795,6 +795,27 @@ class WGDnCIN:
 
 # 8. OncoKB annotator
 class OncoKBAnnotator:
+    """OncoKB annotator
+
+    Arguments:
+        file            {string}    -- A MAF file path
+        folder          {string}    -- The path for output files
+        path            {string}    -- The path for oncokb-annotator
+        token           {string}    -- The personal token provided from OncoKB
+        clinical        {string}    -- The path for clinical data
+        pic             {string}    -- The path especially for output figures(.pdf)
+        cna             {string}    -- (Optional) The path for cna data
+        level           {string}    -- (Optional) The level the user chooses (default = 4)
+
+    Outputs:
+        maf_oncokb_output.txt
+        clinical_oncokb_output.txt
+
+    Pictures:
+        oncokb_total_pie.pdf
+        oncokb_freq_actionable_genes.pdf
+
+    """
     def __init__(self, file):
         print(colored(("\nStart OncoKB annotator(drug)...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
