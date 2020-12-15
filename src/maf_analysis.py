@@ -863,9 +863,6 @@ class OncoKBAnnotator:
         elif level == '1':
             true_num = level_dict['LEVEL_1']
             level_list = ['LEVEL_1']
-        print(true_num)
-        
-        # os._exit()
         # Pie Plot( Total pie plot )
         size = [true_num, sample_size - true_num]
         labels = "Actionable\nbiomarkers"," Current absence\n of new actionable\n biomarkers"
@@ -880,22 +877,24 @@ class OncoKBAnnotator:
         df_drug_count = df[level_list]
         drug_total_dict = {}
         for i in range(sample_size):
+            drug_list = []
             for item in level_list:
                 data = df_drug_count.iloc[i][item]
                 if not pd.isna(data):
                     new_drug_list = data.split("(")
                     new_drug_list.pop(0)
-                    for drug in new_drug_list:
-                        drug_name = drug.split(" ")[0]
-                        if drug_name not in drug_total_dict:
-                            drug_total_dict[drug_name] = 1
-                        else:
-                            drug_total_dict[drug_name] += 1
+                    new_drug_list = [drug.split(" ")[0] for drug in new_drug_list]
+                    for j in new_drug_list:
+                        if j not in drug_list:
+                            drug_list.append(j)
+            for d in drug_list:
+                if d not in drug_total_dict:
+                    drug_total_dict[d] = 1
+                else:
+                    drug_total_dict[d] += 1
         langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
-        # print(langs)
-        print(count)
-        print(sample_size)
         freq = [i/sample_size for i in count]
+        
         fig2 = plt.figure(figsize=(10,5))
         ax2 = fig2.add_axes([0,0,1,1])
         width = 0.7
@@ -907,8 +906,8 @@ class OncoKBAnnotator:
         ax2.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
         ax2.tick_params(axis='y',direction='in', color='#cac9c9')
         plt.yticks(fontsize=LABEL_SIZE-4)
-        plt.xticks(color='#999999',rotation=90, fontsize=LABEL_SIZE-4,horizontalalignment='center',verticalalignment='top')#verticalalignment='bottom',
-        ax2.set_yticks(np.arange(0, 1, 0.2))
+        plt.xticks(color='#222222',rotation=90, fontsize=LABEL_SIZE-4,horizontalalignment='center',verticalalignment='top')#verticalalignment='bottom',
+        ax2.set_yticks(np.arange(0, max(freq)*1.25, 0.1))
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
         plt.ylabel("Percentage", fontsize=LABEL_SIZE, fontweight='bold')
