@@ -798,7 +798,7 @@ class OncoKBAnnotator:
     def __init__(self, file):
         print(colored(("\nStart OncoKB annotator(drug)...."), 'yellow'))
         self.head, self.df = fast_read_maf(file)
-    def data_analysis(self, folder, path, token, clinical, cna):
+    def data_analysis(self, folder, path, token, clinical, cna = ''):
         selected_df = (self.df[['NCBI_Build','Hugo_Symbol', 'Variant_Classification', 'Tumor_Sample_Barcode', 'HGVSp_Short', 'HGVSp',  'Chromosome', 'Start_Position', 'End_Position', 'Reference_Allele', 'Tumor_Seq_Allele1', 'Tumor_Seq_Allele2']]).set_index("Hugo_Symbol")
         selected_df.to_csv(folder + "maf_oncokb_input.txt", sep="\t")
         ## Generate clinical and cna data automatically
@@ -830,9 +830,10 @@ class OncoKBAnnotator:
         p = os.popen("python3 ClinicalDataAnnotator.py -i ../"+clinical+" -o ../"+ folder +"clinical_oncokb_output.txt -a ../"+folder+"maf_oncokb_output.txt\n")
         print(p.read())
         p.close()
-        # p = os.popen("python3 CnaAnnotator.py -i ../"+cna+" -o ../"+folder+"cna_oncokb_output.txt -c ../"+clinical+" -b "+ token + "\n")
-        # print(p.read())
-        # p.close()
+        if cna !='':
+            p = os.popen("python3 CnaAnnotator.py -i ../"+cna+" -o ../"+folder+"cna_oncokb_output.txt -c ../"+clinical+" -b "+ token + "\n")
+            print(p.read())
+            p.close()
         os.chdir("..")
         os.system("rm -rf oncokb-annotator\n")
         # os.system("rm "+folder+"maf_oncokb_input.txt\n")

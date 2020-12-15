@@ -45,11 +45,12 @@ def main():
                         
     parser.add_argument("-tmb","--total_mutation_burden",nargs=2,help="One item must be entered:\n \
                                                                        1. Sequencing Length\n",)
-    parser.add_argument("-oncokb","--oncokb_annotator",nargs=5,help='Three items must be entered:\n \
+    parser.add_argument("-oncokb","--oncokb_annotator",nargs=*,help='Three items must be entered:\n \
                                                                      1. The relative path of the folder "oncokb-annotator".\n \
                                                                      2. The token of your OncoKB account.\n \
                                                                      3. The level of the drug. \n\
-                                                                     4. The file path of clinical input.\n',)
+                                                                     4. The file path of clinical input.\n\
+                                                                     5. (Optional) The file path of cna input.\n')
     parser.add_argument("-hrd","--hrd_score",nargs=2,help="Two items must be entered:\n\
                                                            1. The CSV_input file.\n\
                                                            2. The reference for HRD Score.\n")
@@ -95,7 +96,10 @@ def main():
     # 6. OncoKB Annotator
     if args.oncokb_annotator:
         df = OncoKBAnnotator(args.file[0])
-        # df.data_analysis(folder,args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[3],args.oncokb_annotator[4])
+        if len(args.oncokb_annotator) == 5:
+            df.data_analysis(folder,args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[3],args.oncokb_annotator[4])
+        else:
+            df.data_analysis(folder,args.oncokb_annotator[0],args.oncokb_annotator[1],args.oncokb_annotator[3])
         df.plotting(folder,pic, args.oncokb_annotator[2])
     # 7. HRD score
     if args.hrd_score:
