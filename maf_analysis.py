@@ -45,7 +45,7 @@ def main():
                         
     parser.add_argument("-tmb","--total_mutation_burden",nargs=2,help="One item must be entered:\n \
                                                                        1. Sequencing Length\n",)
-    parser.add_argument("-oncokb","--oncokb_annotator",nargs=*,help='Three items must be entered:\n \
+    parser.add_argument("-oncokb","--oncokb_annotator",nargs='*',help='Three items must be entered:\n \
                                                                      1. The relative path of the folder "oncokb-annotator".\n \
                                                                      2. The token of your OncoKB account.\n \
                                                                      3. The level of the drug. \n\

@@ -53,15 +53,8 @@ python3 maf_analysis.py \
 
 6. ONCOKB
 python3 maf_analysis.py \
--f examples/CBCP_samples/CBCP_oncokb_maf.txt \
--oncokb ../oncokb-annotator/ ca398551-c549-49bd-80f0-0e68d9ca033c 4 examples/CBCP_samples/CBCP_oncokb_clinical.txt examples/CBCP_samples/CBCP_oncokb_cna.txt \
--o examples/CBCP_samples/outputs \
--p examples/CBCP_samples/pictures
-
-
-python3 maf_analysis.py \
 -f examples/TCGA/TCGA_Mutect_v10_white_rerun.maf \
--oncokb ../oncokb-annotator/ ca398551-c549-49bd-80f0-0e68d9ca033c 3 examples/TCGA/clinical_input.txt \
+-oncokb ../oncokb-annotator/ ca398551-c549-49bd-80f0-0e68d9ca033c 4 examples/TCGA/clinical_input.txt \
 -o examples/TCGA/outputs \
 -p examples/TCGA/pictures
 
