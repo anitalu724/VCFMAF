@@ -20,13 +20,19 @@ python3 maf_analysis.py \
 -p examples/TCGA/pictures
 
 
-1.
+4.
 python3 maf_analysis.py \
--f sample_data/out_20201013/maf_combination.maf \
+-f examples/CoMut/TCGA_Mutect_v10_white_rerun.maf \
 -comut \
--o sample_data/out_20201013 \
--p sample_data/pic_20201014
+-o examples/CoMut/outputs \
+-p examples/CoMut/pictures
 
+4-2
+python3 maf_analysis.py \
+-f examples/CoMut/TCGA_Mutect_v10_white_rerun.maf \
+-cmp examples/CoMut/comut.tsv examples/CoMut/comut_info.tsv 0 comut.pdf \
+-o examples/CoMut/outputs \
+-p examples/CoMut/pictures
 
 
 
@@ -107,4 +113,10 @@ python3 maf_analysis.py \
 # conda install -c r r-devtools
 # conda install -c jacek_marzec -c bioconda r-dndscv bioconductor-iranges
 # conda install -c bioconda
+
+
+
+
+
+
 

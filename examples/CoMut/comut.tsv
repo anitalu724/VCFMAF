@@ -1,0 +1,2 @@
+Same Patient	Copy Number Alteration	Mutation Type	Purity	Mutation Signature	Mutation Classification	Frequency	Whole Genome Doubling
+examples/CoMut/outputs/sp.tsv	examples/CoMut/outputs/copy_number_alterations.tsv	examples/CoMut/outputs/mutation_data.tsv	examples/CoMut/outputs/purity.tsv	examples/CoMut/outputs/SigContribution.tsv	examples/CoMut/outputs/mutation_burden.tsv		examples/CoMut/outputs/wgd.tsv
