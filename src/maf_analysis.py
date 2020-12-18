@@ -850,6 +850,7 @@ class HRDScore:
         SUM = list(df["HRD-sum"])
         Sample = tuple(list(df['Sample_id']))
         ind = np.arange(size)
+        print(ind)
         width = 0.7
         fig = plt.figure(figsize=(10, 5))
         ax = fig.add_axes([0,0,1,1])
@@ -1048,6 +1049,7 @@ class OncoKBAnnotator:
         print(colored(("   " + folder + "clinical_oncokb_output.txt"), 'green'))
         # print(colored(("   "+folder+"cna_oncokb_output.txt"), 'green'))
     def plotting(self, folder, pic, level='4'):
+        
         LABEL_SIZE, TITLE_SIZE = 24,30
         self.file = folder + "clinical_oncokb_output.txt"
         df = pd.read_csv(self.file, sep="\t")
@@ -1058,6 +1060,7 @@ class OncoKBAnnotator:
         for i in range(sample_size):
             if df_level.iloc[i]['HIGHEST_LEVEL'] in level_list:
                 level_dict[df_level.iloc[i]['HIGHEST_LEVEL']] += 1
+
         true_num = 0
         if level == '4':
             true_num = sum(level_dict.values())
@@ -1072,7 +1075,6 @@ class OncoKBAnnotator:
             level_list = ['LEVEL_1']
         # Pie Plot( Total pie plot )
         size = [true_num, sample_size - true_num]
-        print(size)
         labels = "Actionable\nbiomarkers"," Current absence\n of new actionable\n biomarkers"
         fig1, ax1 = plt.subplots()
         _, _, autotexts = ax1.pie(size, labels=labels, autopct='%1.1f%%', startangle=90, colors=[COLOR_MAP[3],COLOR_MAP[4]] ,textprops={'fontsize': LABEL_SIZE})
@@ -1081,44 +1083,64 @@ class OncoKBAnnotator:
         # plt.title("Total", fontsize=18, fontweight='bold')
         plt.savefig(pic+"oncokb_total_pie.pdf", dpi=300, bbox_inches='tight')
         print(colored(("=> Generate Pie Plot: " + pic + "oncokb_total_pie.pdf"), 'green'))
+        
         # Bar Plot( Frequency of Actionable Genes )
         df_drug_count = df[level_list]
         drug_total_dict = {}
         for i in range(sample_size):
-            drug_list = []
-            for item in level_list:
+            drug_list = [[], [], [], [], [], []]    # [total, level1, level2, level3A, level3B, level4]
+            for idx, item in enumerate(level_list):
                 data = df_drug_count.iloc[i][item]
                 if not pd.isna(data):
                     new_drug_list = data.split("(")
                     new_drug_list.pop(0)
                     new_drug_list = [drug.split(" ")[0] for drug in new_drug_list]
                     for j in new_drug_list:
-                        if j not in drug_list:
-                            drug_list.append(j)
-            for d in drug_list:
-                if d not in drug_total_dict:
-                    drug_total_dict[d] = 1
-                else:
-                    drug_total_dict[d] += 1
-        langs,count = list(drug_total_dict.keys()), list(drug_total_dict.values())
-        print(drug_total_dict)
-        freq = [i/sample_size for i in count]
+                        if j not in drug_list[0]:
+                            drug_list[0].append(j)
+                            drug_list[idx+1].append(j)
+            for j in range(5):
+                for item in drug_list[j+1]:
+                    if item not in drug_total_dict:
+                        drug_total_dict[item] = [0,0,0,0,0]
+                        drug_total_dict[item][j] += 1
+                    else:
+                        drug_total_dict[item][j] += 1
+        
+        drug_df = pd.DataFrame(drug_total_dict)
+        ALL_DRUG_LIST = drug_df.columns
+        
+        SUM = (drug_df.sum()).tolist()
+
+        List1 = tuple(list(np.asarray(drug_df.iloc[0,:].tolist())/sample_size))
+        List2 = tuple(list(np.asarray(drug_df.iloc[1,:].tolist())/sample_size))
+        List3A = tuple(list(np.asarray(drug_df.iloc[2,:].tolist())/sample_size))
+        List3B = tuple(list(np.asarray(drug_df.iloc[3,:].tolist())/sample_size))
+        List4 = tuple(list(np.asarray(drug_df.iloc[4,:].tolist())/sample_size))
+        LEVEL_COLOR = ['#359744', '#286ea0', '#8a4a8d', '#b490b5','#3d3d3b']
+        width = 0.7
         fig2 = plt.figure(figsize=(10,5))
         ax2 = fig2.add_axes([0,0,1,1])
-        width = 0.7
-        ax2.bar(langs, freq, width, color=COLOR_MAP[4])
+        
+        ax2.bar(ALL_DRUG_LIST, List1 ,  width, color=LEVEL_COLOR[0])
+        ax2.bar(ALL_DRUG_LIST, List2 ,  width, bottom=List1,color=LEVEL_COLOR[1])
+        ax2.bar(ALL_DRUG_LIST, List3A , width, bottom = np.array(List1)+np.array(List2),color=LEVEL_COLOR[2])
+        ax2.bar(ALL_DRUG_LIST, List3B , width, bottom = np.array(List1)+np.array(List2)+np.array(List3A),color=LEVEL_COLOR[3])
+        ax2.bar(ALL_DRUG_LIST, List4 ,  width, bottom = np.array(List1)+np.array(List2)+np.array(List3A)+np.array(List3B), color=LEVEL_COLOR[4])
         ax2.spines['right'].set_visible(False)
         ax2.spines['top'].set_visible(False)
         ax2.spines['bottom'].set_color('#cac9c9')
         ax2.spines['left'].set_color('#cac9c9')
+        plt.ylabel("Percentage", fontsize=LABEL_SIZE, fontweight='bold')
         ax2.tick_params(axis='x',direction='in', color='#cac9c9', length=0)
         ax2.tick_params(axis='y',direction='in', color='#cac9c9')
         plt.yticks(fontsize=LABEL_SIZE-4)
+        ax2.yaxis.set_major_formatter(mtick.PercentFormatter(xmax=1, decimals=0))
+        ax2.set_yticks(np.arange(0, max(SUM)/sample_size*1.25, 0.2))
         plt.xticks(color='#222222',rotation=90, fontsize=LABEL_SIZE-4,horizontalalignment='center',verticalalignment='top')#verticalalignment='bottom',
-        ax2.set_yticks(np.arange(0, max(freq)*1.25, 0.1))
-        ax2.spines['right'].set_visible(False)
-        ax2.spines['top'].set_visible(False)
-        plt.ylabel("Percentage", fontsize=LABEL_SIZE, fontweight='bold')
+        ax2.legend(labels=level_list, fontsize=LABEL_SIZE-4, edgecolor='white')
+        # ax2.set_yticks(np.arange(0, max(freq)*1.25, 0.1))
+
         # plt.title("Frequency of Actionable Genes", fontsize=20, fontweight='bold')
         plt.savefig(pic+"oncokb_freq_actionable_genes.pdf", dpi=300,bbox_inches='tight')
         print(colored(("=> Generate Bar Plot: " + pic + "oncokb_freq_actionable_genes.pdf"), 'green'))
