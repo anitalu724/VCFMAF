@@ -22,9 +22,6 @@ from src.maf_analysis import (
     WGDnCIN
 )
 
-
-
-
 def main():
     parser = argparse.ArgumentParser(
         description="MAF analysis", formatter_class=argparse.RawTextHelpFormatter
