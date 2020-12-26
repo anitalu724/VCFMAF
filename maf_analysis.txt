@@ -60,11 +60,6 @@ python3 maf_analysis.py \
 -p examples/Tissue_samples/pictures
 
 
-
-
-
-
-
 6.HRD_score
 python3 maf_analysis.py \
 -f examples/CBCP_samples/CBCP_oncokb_maf.txt \

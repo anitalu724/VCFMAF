@@ -10,17 +10,28 @@ import numpy as np
 import pandas as pd
 import argparse, textwrap
 import ast
-from src.maf_analysis import (
-    CoMutAnalysis,
-    CoMutPlot,
-    SigMutatedGeneDetection,
-    KnownCancerGeneAnnotation,
-    MutationalSignature,
-    TotalMutationBurden,
-    OncoKBAnnotator,
-    HRDScore,
-    WGDnCIN
-)
+from src.sig_mutated_gene_detect import SigMutatedGeneDetection
+from src.known_cancer_gene_anno import KnownCancerGeneAnnotation
+from src.tmb import TotalMutationBurden
+from src.comut_analysis import CoMutAnalysis
+from src.comut_plot import CoMutPlot
+from src.mutational_sig import MutationalSignature
+from src.hrd import HRDScore
+from src.wgd_cin import WGDnCIN
+from src.oncokb_anno import OncoKBAnnotator
+
+
+# from src.maf_analysis import (
+#     CoMutAnalysis,
+#     CoMutPlot,
+#     SigMutatedGeneDetection,
+#     KnownCancerGeneAnnotation,
+#     MutationalSignature,
+#     TotalMutationBurden,
+#     OncoKBAnnotator,
+#     HRDScore,
+#     WGDnCIN
+# )
 
 def main():
     parser = argparse.ArgumentParser(
@@ -90,7 +101,7 @@ def main():
     # 4.2 CoMut Plotting
     if args.comut_plot:
         plot1 = CoMutPlot(args.comut_plot[0], args.comut_plot[1])
-        plot1.plot(folder, args.comut_plot[2], args.comut_plot[3])
+        plot1.plot(pic, args.comut_plot[2], args.comut_plot[3])
     # 5. Mutational signature
     if args.mutational_signature:
         df = MutationalSignature(args.file[0])
