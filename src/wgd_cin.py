@@ -60,7 +60,7 @@ class WGDnCIN:
             sample_name = pd.unique(df['SampleID'])[0]
             sample_list.append(sample_name)
             WGD_selected = df.loc[(df['A_cn'] >= 2)]
-            CIN_selected = df.loc[(df['A_cn'] != 1) or (df['B_cn'] != 1)]
+            CIN_selected = df.loc[(df['A_cn'] != 1) | (df['B_cn'] != 1)]
             WGD_SUM, CIN_SUM = 0, 0
             for i in range(WGD_selected.shape[0]):
                 WGD_SUM += WGD_selected.iloc[i]['End_position']-WGD_selected.iloc[i]['Start_position']
