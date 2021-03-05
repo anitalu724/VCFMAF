@@ -1,6 +1,6 @@
 ###### tags: `Lab`
-# MyLabTool
-MyLabTool is a Python tool for preprocessing variant call format(VCF) and mutation annotation format(MAF) files and 
+# MutScape
+MutScape is a Python tool for preprocessing variant call format(VCF) and mutation annotation format(MAF) files and 
 
 ## Prerequisite
 ```bash=
