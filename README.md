@@ -144,5 +144,4 @@ python3 maf_analysis.py \
 ###
 
 ______
-####
-* My oncokb token: ca398551-c549-49bd-80f0-0e68d9ca033c
+
